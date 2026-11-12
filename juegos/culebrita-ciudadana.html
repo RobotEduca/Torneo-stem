@@ -1,0 +1,1023 @@
+<title>Culebrita Ciudadana</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* Concepto: ciudad nocturna de neón. Una culebrita recorre un camino de 5 niveles; el rosa lidera sobre un violeta profundo. */
+:root{
+  --night:#150a33; --panel:#231046; --panel-2:#2f1862; --line:#4b2d92;
+  --pink:#ff5fb0; --blue:#4db5ff; --violet:#a56bff; --mint:#3ee6b8; --gold:#ffd25e;
+  --ink:#f8f1ff; --muted:#c3b3ea; --on-color:#1a0b3b; --bad:#ff7a8a; --good:#3ee6b8;
+  --display:"Bangers","Impact",system-ui,sans-serif;
+  --body:"Nunito",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background-color:var(--night)}
+body{
+  margin:0;color:var(--ink);font:500 16px/1.5 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 40px;
+  background:
+    radial-gradient(900px 500px at 8% -10%,rgba(255,95,176,.28),transparent 60%),
+    radial-gradient(800px 520px at 100% 20%,rgba(77,181,255,.20),transparent 60%),
+    radial-gradient(700px 500px at 40% 110%,rgba(165,107,255,.25),transparent 60%),
+    var(--night);
+  background-color:var(--night);
+}
+.wrap{max-width:1040px;margin:0 auto}
+h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
+h1,h2{font-family:var(--display);letter-spacing:.04em}
+h1{font-size:clamp(44px,9vw,84px);line-height:.95}
+h2{font-size:clamp(30px,5.5vw,46px);line-height:1}
+h3{font:800 19px/1.25 var(--body)}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.up{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+a{color:var(--blue)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* barra superior */
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 0}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:26px;letter-spacing:.05em;cursor:pointer;background:none;border:0;padding:0;color:var(--ink)}
+.brand svg{width:40px;height:40px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.nav .btn{padding:8px 14px;font-size:14px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--line);background:var(--panel-2);color:var(--ink);padding:11px 20px;border-radius:999px;font-weight:800;cursor:pointer;text-decoration:none;transition:transform .12s,background .12s}
+.btn:hover{background:#3b2078;transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:linear-gradient(135deg,var(--pink),var(--violet));border-color:transparent;color:var(--on-color);font-size:17px;padding:13px 26px}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.blue{background:var(--blue);border-color:transparent;color:var(--on-color)}
+.btn.ghost{background:transparent}
+.btn.danger{border-color:var(--bad);color:var(--bad);background:transparent}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.btn.on{background:var(--mint);color:var(--on-color);border-color:transparent}
+
+.card{background:var(--panel);border:2px solid var(--line);border-radius:22px;padding:22px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 12px;border-radius:999px;font-size:13px;font-weight:800;background:var(--c,var(--violet));color:var(--on-color)}
+.chip.line{background:transparent;color:var(--muted);border:1.5px solid var(--line)}
+section[hidden]{display:none}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+/* inicio */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:center;padding:18px 0 26px}
+.hero .lead{font-size:19px;max-width:46ch;margin-top:14px}
+.hero h1 em{font-style:normal;color:var(--pink)}
+.hero-art{display:flex;justify-content:center}
+.hero-art svg{width:min(100%,360px);height:auto;filter:drop-shadow(0 0 28px rgba(255,95,176,.45))}
+.tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.cols-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-weight:800;font-size:14px}
+.field input,.field select,.field textarea{background:#190c3a;border:2px solid var(--line);border-radius:14px;padding:12px 14px;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pink);outline:none}
+.team-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow:auto}
+.team-pick{display:flex;justify-content:space-between;gap:10px;align-items:center;text-align:left;width:100%;background:#190c3a;border:2px solid var(--line);border-radius:14px;padding:10px 14px;cursor:pointer;color:var(--ink)}
+.team-pick:hover{border-color:var(--pink)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+.step{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:16px}
+.step b{display:block;font-family:var(--display);font-size:26px;letter-spacing:.04em;color:var(--gold);margin-bottom:4px}
+
+/* mapa */
+.map-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:10px 0 22px}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:8px 16px;min-width:110px}
+.stat b{display:block;font-family:var(--display);font-size:30px;letter-spacing:.04em;line-height:1.1}
+.road{list-style:none;margin:0;padding:0;position:relative;display:flex;flex-direction:column;gap:18px}
+.road::before{content:"";position:absolute;left:27px;top:20px;bottom:20px;width:0;border-left:5px dotted var(--line)}
+.lvl{display:grid;grid-template-columns:56px 1fr;gap:16px;align-items:start;position:relative}
+.node{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:28px;background:var(--panel-2);border:3px solid var(--line);position:relative;z-index:1}
+.lvl.done .node{background:var(--c);color:var(--on-color);border-color:transparent}
+.lvl.now .node{background:var(--c);color:var(--on-color);border-color:var(--gold);box-shadow:0 0 0 5px rgba(255,210,94,.25)}
+.lvl.lock{opacity:.55}
+.lvl .card{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:16px 20px}
+.lvl .card svg{width:78px;height:78px}
+.lvl .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.snake-here{position:absolute;left:-6px;top:-18px;width:44px;height:44px;z-index:2;pointer-events:none}
+
+/* introducción de nivel */
+.intro{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center}
+.intro svg{width:190px;height:190px;filter:drop-shadow(0 0 24px var(--c))}
+.bubble{background:#190c3a;border:2px solid var(--c);border-radius:22px;padding:16px 20px;margin:14px 0}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 20px}
+.rules div{background:#190c3a;border:2px solid var(--line);border-radius:14px;padding:10px 12px;font-size:14px}
+.rules b{display:block;color:var(--gold)}
+
+/* juego */
+.hud{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:6px 0 14px}
+.hud .pill{background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:5px 16px;font-weight:800;display:flex;gap:8px;align-items:center;font-variant-numeric:tabular-nums}
+.hud .pill b{font-family:var(--display);font-size:24px;letter-spacing:.04em;font-weight:400}
+.shields{display:flex;gap:4px}
+.shield{width:22px;height:24px}
+.shield.off{opacity:.25;filter:grayscale(1)}
+.hud .grow{flex:1;min-width:8px}
+.play{display:grid;grid-template-columns:minmax(0,520px) minmax(0,1fr);gap:20px;align-items:start}
+.board-box{position:relative;border-radius:20px;overflow:hidden;border:3px solid var(--c,var(--pink));box-shadow:0 0 36px -6px var(--c,var(--pink));background:#0f0627;line-height:0}
+#board{width:100%;height:auto;aspect-ratio:1;display:block;touch-action:none}
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:10px;padding:16px;line-height:1.4;text-align:center;pointer-events:none}
+.ov.paused{justify-content:center;background:rgba(21,10,51,.82);pointer-events:auto}
+.board-box{touch-action:none}
+.ov .msg{background:rgba(21,10,51,.88);border:2px solid var(--c,var(--pink));border-radius:14px;padding:8px 14px;font-weight:800;font-size:14px}
+.ov[hidden]{display:none}
+.dpad{display:none;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,58px);gap:8px;justify-content:center;margin-top:14px}
+.dpad button{border-radius:16px;border:2px solid var(--line);background:var(--panel-2);font-size:24px;cursor:pointer;color:var(--ink)}
+.dpad button:active{background:var(--pink);color:var(--on-color)}
+.dpad .u{grid-column:2;grid-row:1}.dpad .l{grid-column:1;grid-row:2}.dpad .d{grid-column:2;grid-row:2}.dpad .r{grid-column:3;grid-row:2}
+@media (hover:none),(max-width:900px){.dpad{display:grid}}
+.qcard{background:var(--panel);border:2px solid var(--line);border-radius:22px;padding:20px}
+.qcard .qtext{font-size:19px;font-weight:800;line-height:1.35;margin:10px 0 14px}
+.opts{display:flex;flex-direction:column;gap:8px;padding:0;margin:0;list-style:none}
+.opts li{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start;background:#190c3a;border:2px solid var(--line);border-radius:14px;padding:9px 12px}
+.opts .ltr{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--c);color:var(--on-color)}
+.opts li.gone{opacity:.4;text-decoration:line-through}
+.opts li.hit{border-color:var(--good)}
+.hint{margin-top:12px;font-size:14px;color:var(--muted)}
+.fb{margin-top:14px;border-radius:18px;padding:16px 18px;border:2px solid var(--good);background:rgba(62,230,184,.10)}
+.fb.bad{border-color:var(--bad);background:rgba(255,122,138,.10)}
+.fb h3{font-family:var(--display);font-weight:400;font-size:28px;letter-spacing:.04em}
+.fb .pts{color:var(--gold);font-weight:800}
+.fb p{margin-top:6px}
+.fb .btn{margin-top:12px}
+.toast{margin-top:10px;font-weight:800;color:var(--bad);min-height:1.5em}
+
+/* resultado */
+.res{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center}
+.res svg.gem{width:150px;height:150px;filter:drop-shadow(0 0 22px var(--c))}
+.bars{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.bar{display:grid;grid-template-columns:minmax(110px,170px) 1fr 52px;gap:10px;align-items:center;font-size:14px}
+.bar i{display:block;height:12px;border-radius:99px;background:#190c3a;border:1.5px solid var(--line);overflow:hidden}
+.bar i span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--pink));border-radius:99px}
+.cert{margin-top:22px;border:3px solid var(--gold);border-radius:24px;padding:22px;background:linear-gradient(135deg,rgba(255,210,94,.14),rgba(255,95,176,.12))}
+.code{display:inline-block;font:800 26px/1 var(--body);letter-spacing:.18em;background:#190c3a;border:2px dashed var(--gold);border-radius:12px;padding:10px 16px;margin:8px 0}
+.ratebox{display:inline-grid;place-items:center;width:78px;height:78px;border-radius:50%;background:var(--gold);color:var(--on-color);font-family:var(--display);font-size:44px}
+
+/* tablas */
+.tbl{overflow-x:auto;border:2px solid var(--line);border-radius:18px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-variant-numeric:tabular-nums}
+th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:#1c0e3f;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tr.me td{background:rgba(255,95,176,.14)}
+td.pos{font-family:var(--display);font-size:26px;letter-spacing:.04em;width:56px}
+.rate{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--gold);color:var(--on-color);font-weight:800}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--mint)}
+.live::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint)}
+.live.off{color:var(--muted)}
+.live.off::before{background:var(--muted);box-shadow:none}
+details.tm{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:0}
+details.tm>summary{cursor:pointer;list-style:none;display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center;padding:14px 18px}
+details.tm>summary::-webkit-details-marker{display:none}
+details.tm[open]>summary{border-bottom:1px solid var(--line)}
+.tm-body{padding:16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.lv-mini{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.lv-mini div{background:#190c3a;border:2px solid var(--line);border-radius:12px;padding:8px;text-align:center;font-size:13px}
+.lv-mini b{display:block;font-family:var(--display);font-size:22px;font-weight:400;letter-spacing:.04em}
+.lv-mini .ok{border-color:var(--good)}
+.guide h3{margin:18px 0 6px;color:var(--gold)}
+.guide ul,.guide ol{margin:6px 0 0;padding-left:22px}
+.guide li{margin:3px 0}
+.modal{position:fixed;inset:0;background:rgba(10,4,28,.8);display:grid;place-items:center;padding:20px;z-index:50;overflow:auto}
+.modal[hidden]{display:none}
+.modal .card{max-width:680px;width:100%;max-height:90vh;overflow:auto}
+.modal textarea{width:100%;height:220px;background:#190c3a;border:2px solid var(--line);border-radius:12px;padding:10px;font:13px/1.4 ui-monospace,Menlo,Consolas,monospace}
+
+@media (max-width:900px){
+  .hero,.play,.cols-2,.res,.intro,.tm-body{grid-template-columns:1fr}
+  .hero-art{order:-1}.hero-art svg{width:200px}
+  .steps,.rules{grid-template-columns:1fr}
+  .intro svg{width:130px;height:130px}
+  .lv-mini{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .lvl .card{grid-template-columns:auto 1fr}.lvl .card .btn{grid-column:1/-1}
+  .bar{grid-template-columns:100px 1fr 46px}
+  details.tm>summary{grid-template-columns:1fr auto}
+  .board-box{max-width:520px;margin:0 auto;width:100%}
+  .play>div:nth-child(2){order:-1}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <button class="brand" data-act="go-home" aria-label="Ir al inicio">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lgBrand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5fb0"/><stop offset="1" stop-color="#4db5ff"/></linearGradient></defs><path d="M10 50c0-10 12-8 16-14s-6-10 2-16 22-2 22 8c0 8-10 8-10 14" fill="none" stroke="url(#lgBrand)" stroke-width="10" stroke-linecap="round"/><circle cx="50" cy="26" r="2.6" fill="#fff"/><circle cx="50.6" cy="26" r="1.1" fill="#1a0b3b"/></svg>
+      Culebrita Ciudadana
+    </button>
+    <nav class="nav" aria-label="Menú">
+      <button class="btn" data-act="go-board">Tabla del torneo</button>
+      <button class="btn" data-act="go-help">Cómo se juega</button>
+      <button class="btn" data-act="go-teacher">Docente</button>
+      <button class="btn" id="b-sfx" data-act="sfx" aria-pressed="true">Efectos: sí</button>
+      <button class="btn" id="b-music" data-act="music" aria-pressed="false">Música: no</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- INICIO -->
+    <section id="s-home">
+      <div class="hero">
+        <div>
+          <p class="up">Torneo ENS Divina Providencia · Derechos humanos y respeto · Décimo</p>
+          <h1 style="margin-top:10px">La <em>culebrita</em> que sabe convivir</h1>
+          <p class="lead">Guía a Chispa por el camino de la convivencia. Come la gema con la respuesta correcta, esquiva muros y tu propia cola, y reúne los cinco cristales de poder de las heroínas de Villa Convivencia.</p>
+          <div class="tag-row">
+            <span class="chip" style="--c:var(--pink)">Respeto</span><span class="chip" style="--c:var(--blue)">Empatía</span><span class="chip" style="--c:var(--violet)">Derechos y deberes</span><span class="chip" style="--c:var(--mint)">Paz y convivencia</span>
+          </div>
+        </div>
+        <div class="hero-art" id="hero-art" aria-hidden="true"></div>
+      </div>
+
+      <div class="cols-2">
+        <form class="card" id="f-join" autocomplete="off">
+          <h2 style="font-size:34px;margin-bottom:12px">Registra tu equipo</h2>
+          <div class="field"><label for="in-team">Nombre del equipo</label><input id="in-team" maxlength="30" required placeholder="Ej. Las Guardianas del 10-B"></div>
+          <div class="field"><label for="in-members">Integrantes (nombres o apodos, separados por coma)</label><input id="in-members" maxlength="140" placeholder="Ej. Sofi, Valen, Mariana"></div>
+          <button class="btn primary" type="submit">Entrar al torneo</button>
+          <p class="small muted" id="join-msg" style="margin-top:10px" role="status"></p>
+        </form>
+        <div class="card">
+          <h2 style="font-size:34px;margin-bottom:12px">Continuar una partida</h2>
+          <p class="muted small" style="margin-bottom:10px">Tu progreso queda guardado. Puedes seguir en otra sesión.</p>
+          <div class="team-list" id="team-list"></div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step"><b>1 · Lee</b>Cada nivel trae una pregunta o una situación de la vida escolar y ciudadana.</div>
+        <div class="step"><b>2 · Mueve</b>Dirige a Chispa con flechas, WASD o deslizando el dedo hasta la gema de la respuesta correcta.</div>
+        <div class="step"><b>3 · Aprende</b>Después de cada respuesta recibes una explicación. Con ella ganas puntos y subes en el torneo.</div>
+      </div>
+    </section>
+
+    <!-- MAPA -->
+    <section id="s-map" hidden>
+      <div class="map-head">
+        <div>
+          <p class="up">Camino de la convivencia</p>
+          <h2 id="map-team">Equipo</h2>
+          <p class="muted small" id="map-members"></p>
+        </div>
+        <div class="stats" id="map-stats"></div>
+      </div>
+      <ol class="road" id="road"></ol>
+      <div id="map-final"></div>
+    </section>
+
+    <!-- INTRO DE NIVEL -->
+    <section id="s-intro" hidden>
+      <div class="card intro" id="intro-card"></div>
+    </section>
+
+    <!-- JUEGO -->
+    <section id="s-game" hidden>
+      <div class="hud" id="hud" aria-live="polite"></div>
+      <div class="play">
+        <div>
+          <div class="board-box" id="board-box">
+            <canvas id="board" width="480" height="480" aria-label="Tablero de la culebrita"></canvas>
+            <div class="ov" id="ov" hidden></div>
+          </div>
+          <div class="dpad" aria-label="Controles">
+            <button class="u" data-act="dir" data-d="u" aria-label="Arriba">▲</button>
+            <button class="l" data-act="dir" data-d="l" aria-label="Izquierda">◀</button>
+            <button class="d" data-act="dir" data-d="d" aria-label="Abajo">▼</button>
+            <button class="r" data-act="dir" data-d="r" aria-label="Derecha">▶</button>
+          </div>
+        </div>
+        <div>
+          <div class="qcard" id="qcard"></div>
+          <div class="toast" id="toast" role="status"></div>
+          <div id="fb" aria-live="assertive"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTADO -->
+    <section id="s-result" hidden><div class="card" id="res-card"></div><div id="res-final"></div></section>
+
+    <!-- TABLA -->
+    <section id="s-board" hidden>
+      <div class="map-head">
+        <div><p class="up">Clasificación</p><h2>Tabla del torneo</h2></div>
+        <span class="live" id="live-flag">Solo este dispositivo</span>
+      </div>
+      <div class="tbl"><table><thead><tr><th>#</th><th>Equipo</th><th>Niveles</th><th>Puntos</th><th>Aciertos</th><th>Calificación</th></tr></thead><tbody id="board-body"></tbody></table></div>
+      <p class="small muted" style="margin-top:12px">La calificación es una estimación en escala 1 a 5 con base en los aciertos del equipo. El docente puede ajustarla.</p>
+    </section>
+
+    <!-- DOCENTE -->
+    <section id="s-teacher" hidden></section>
+
+    <!-- AYUDA -->
+    <section id="s-help" hidden>
+      <div class="card guide" id="help-card"></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="modal" hidden><div class="card" id="modal-card"></div></div>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rand=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rand(i+1);const t=a[i];a[i]=a[j];a[j]=t}return a};
+const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ======== CONFIGURACIÓN (el docente puede editar el PIN) ======== */
+const TEACHER_PIN='1234';
+const LS='culebrita-ens-v1';
+const GRID=20, CELL=24;
+const COLORS=['#ff5fb0','#4db5ff','#a56bff','#3ee6b8','#ffd25e'];
+const RATING=['','Básico','Satisfactorio','Bueno','Muy bueno','Excelente'];
+const TAGS={respeto:'Respeto',tolerancia:'Tolerancia',empatia:'Empatía',derechos:'Derechos',deberes:'Deberes',conflictos:'Resolución de conflictos',convivencia:'Convivencia escolar',participacion:'Participación'};
+const TYPES={c:'Concepto',s:'Situación escolar',j:'Justificar',a:'Contexto nuevo',r:'Reto ciudadano'};
+
+/* ======== CONTENIDO ======== */
+/* Q(tipo, concepto, pregunta, opciones [las primeras k son correctas], explicación, k) */
+const Q=(t,g,q,o,e,k)=>({t,g,q,o,e,k:k||1});
+const HEROES=[
+  {name:'Lumi',power:'Escudo del Respeto',color:'#ff5fb0',skin:'#f1c7a1',hair:'#3a1f4d',hs:0},
+  {name:'Aura',power:'Latido de la Empatía',color:'#4db5ff',skin:'#c68d63',hair:'#1c2a5e',hs:1},
+  {name:'Lexa',power:'Balanza de Derechos Humanos',color:'#a56bff',skin:'#8d5a3b',hair:'#2a1236',hs:2},
+  {name:'Calma',power:'Puente de la Paz',color:'#3ee6b8',skin:'#e8b48a',hair:'#17433b',hs:3},
+  {name:'Nova',power:'Torre de la Convivencia',color:'#ffd25e',skin:'#f4d3b8',hair:'#7a3b12',hs:4}
+];
+const LEVELS=[
+ {name:'Escudo del Respeto',topic:'Respeto y tolerancia',tick:190,
+  story:'Una grieta de burlas y gritos se abrió en Villa Convivencia. Lumi necesita el Cristal del Respeto para reparar su escudo. Ayúdala: tu culebrita Chispa debe llegar a las gemas con las respuestas que protegen la dignidad de todos.',
+  items:[
+   Q('c','respeto','¿Qué significa respetar a las demás personas?',['Reconocer su dignidad y sus derechos, aunque piensen o sean distintas a mí','Estar de acuerdo con todo lo que dicen','Evitar hablarles para no tener problemas','Obedecer siempre a quien tenga más edad o más poder'],'Respetar es reconocer el valor y los derechos del otro. No exige estar de acuerdo ni obedecer sin criterio.'),
+   Q('c','tolerancia','La tolerancia ciudadana consiste en…',['Respetar ideas, creencias y formas de vida distintas, siempre que no vulneren los derechos de los demás','Aceptar cualquier conducta, incluso la que daña a otros','Callar cuando algo me molesta','Convivir solo con quienes piensan como yo'],'La tolerancia tiene un límite claro: los derechos de las demás personas. Tolerar no es permitir la agresión.'),
+   Q('s','respeto','En clase, una compañera expone una opinión con la que no estás de acuerdo. ¿Qué actitud demuestra respeto?',['Escucharla hasta el final y luego expresar tu desacuerdo con argumentos','Interrumpirla y corregirla en voz alta','Reírte con el grupo para que cambie de opinión','Ignorarla y conversar con tu vecino'],'El respeto en el debate se muestra escuchando y discrepando con argumentos, sin burlas ni interrupciones.'),
+   Q('s','tolerancia','Un compañero se viste y se peina distinto a la mayoría, y algunos lo molestan por eso. ¿Qué es lo más adecuado?',['Rechazar la burla, acercarte al compañero y, si continúa, informar a un docente o al Comité de Convivencia','Unirte a las burlas para no quedar excluido','Quedarte callado porque «no es tu problema»','Decirle que cambie su apariencia para que lo dejen en paz'],'El libre desarrollo de la personalidad (Art. 16 de la Constitución) protege su forma de ser. Quien debe cambiar es quien agrede, no quien es diferente.'),
+   Q('j','respeto','Una estudiante dice: «Tengo libertad de expresión, así que puedo decir lo que quiera de cualquiera». ¿Cuál es la mejor respuesta?',['La libertad de expresión es un derecho, pero termina donde empiezan la honra y la dignidad de los demás','Tiene razón: la libertad de expresión no tiene ningún límite','Solo los adultos tienen libertad de expresión','La libertad de expresión solo aplica en redes sociales'],'La Constitución protege la expresión (Art. 20) y también la honra y la intimidad (Arts. 15 y 21). Los derechos se ejercen sin dañar a otros.'),
+   Q('a','tolerancia','Empiezas un trabajo de medio tiempo y tus compañeros practican costumbres religiosas distintas a las tuyas. ¿Qué es lo más coherente con la tolerancia?',['Respetar sus creencias y dialogar con calma si algo afecta el trabajo conjunto','Pedirles que no practiquen sus costumbres en el trabajo','Burlarte discretamente para ser aceptado','Evitarlos por completo'],'La libertad de cultos y de conciencia se respeta en cualquier lugar. Si hay un desacuerdo práctico, se resuelve dialogando.'),
+   Q('r','respeto','RETO: En el grupo de WhatsApp del curso circulan memes que ridiculizan a una compañera por su acento. ¿Qué DOS acciones muestran respeto y responsabilidad?',['Dejar de compartir el contenido y pedir que lo eliminen porque ofende','Hablar con la compañera para apoyarla e informar a un docente si continúa','Reenviar el meme «solo para reírse un rato»','Callar porque «son solo bromas»','Responder con otros memes ofensivos contra quienes lo publicaron'],'Reenviar, callar o contraatacar mantiene la agresión. Frenar la difusión y acompañar a la persona afectada la protege.',2)
+  ]},
+ {name:'Latido de la Empatía',topic:'Empatía',tick:170,
+  story:'En el barrio de Aura, la gente dejó de escucharse. Su corazón-faro late cada vez más débil. Solo el Cristal de la Empatía puede devolverle la luz. Guía a Chispa hacia las respuestas que ponen a las personas en el centro.',
+  items:[
+   Q('c','empatia','La empatía es…',['La capacidad de comprender lo que otra persona siente y piensa, poniéndose en su lugar','Sentir lástima por quien sufre y alejarse','Estar siempre de acuerdo con los demás','Resolver los problemas ajenos sin preguntar'],'Ser empático no significa aprobarlo todo, sino comprender la perspectiva y las emociones de la otra persona.'),
+   Q('c','empatia','¿Cuál es una muestra de escucha empática?',['Mirar a la persona, no interrumpir y decir lo que entendiste: «parece que te sentiste excluido»','Dar consejos de inmediato sin dejar que termine','Contar una experiencia tuya más grave para comparar','Decirle «no es para tanto»'],'La escucha empática reconoce la emoción del otro antes de aconsejar o comparar.'),
+   Q('s','empatia','Una compañera llega llorando y no quiere hablar. ¿Qué es lo más empático?',['Acercarte con calma, decirle que cuenta contigo y respetar que hable cuando esté lista','Preguntarle en voz alta, frente a todos, qué le pasa','Ignorarla porque no quiere hablar','Decirle que deje de llorar'],'Acompañar sin presionar respeta los tiempos y la privacidad de la persona.'),
+   Q('s','empatia','Llega un compañero nuevo de otra región, con un acento distinto, y casi no tiene amigos. ¿Qué acción es empática y respetuosa?',['Invitarlo a integrarse al grupo e interesarte por conocer sus costumbres','Imitar su acento en broma para hacerlo sentir parte','Esperar a que él dé el primer paso','Evitarlo para no incomodarlo'],'La inclusión se construye acercándose con interés genuino, sin burlas ni distancia.'),
+   Q('j','empatia','¿Por qué la empatía es importante para la convivencia?',['Porque ayuda a comprender las emociones de otros y a decidir cómo actuar sin lastimarlos','Porque garantiza que nunca haya conflictos','Porque permite convencer a los demás de pensar igual','Porque evita tener opiniones propias'],'La empatía no elimina los conflictos, pero ayuda a manejarlos sin causar daño.'),
+   Q('a','empatia','En una red social ves que una persona cuenta que pasa por un momento muy difícil y recibe comentarios burlones. ¿Qué respuesta aplica mejor la empatía en lo digital?',['Escribirle en privado un mensaje de apoyo, reportar los comentarios ofensivos y no sumarte a las burlas','Reaccionar con «me divierte» para no quedar fuera','Comentar que exagera','Guardar silencio y compartir una captura con tus amigos'],'En entornos digitales la empatía también cuenta: apoyar a la persona y no amplificar la burla.'),
+   Q('r','empatia','RETO: Dos amigas se pelearon y una se aisló del grupo; notas que está triste. ¿Qué DOS acciones muestran empatía genuina?',['Acercarte, escuchar sin juzgar y preguntarle cómo puedes apoyarla','Respetar sus tiempos, dejarle saber que cuentas con ella y sugerir orientación escolar si lo ves necesario','Contar a todos lo que le pasa para que la ayuden','Obligarla a reconciliarse ya mismo','Decirle que la otra tiene toda la culpa para consolarla'],'La empatía escucha sin juzgar y respeta los tiempos. Exponerla, presionarla o tomar partido no la ayuda.',2)
+  ]},
+ {name:'Balanza de Derechos Humanos',topic:'Derechos humanos y deberes',tick:150,
+  story:'La Balanza de Lexa se inclinó: algunos reclaman derechos y olvidan sus deberes, y otros no conocen sus derechos humanos. Recupera el Cristal de la Balanza con las respuestas que los equilibran.',
+  items:[
+   Q('c','derechos','La Declaración Universal de los Derechos Humanos fue proclamada por la Organización de las Naciones Unidas en…',['1948','1991','1886','2006'],'La ONU proclamó la Declaración Universal en 1948. Colombia incorporó estos principios en su Constitución de 1991, que reconoce derechos fundamentales a todas las personas.'),
+   Q('c','deberes','¿Qué relación existe entre derechos y deberes?',['Son correlativos: ejercer mis derechos implica respetar los de los demás y cumplir mis deberes','Los derechos se tienen sin ninguna responsabilidad','Los deberes son solo para los adultos','Los derechos desaparecen si incumplo un deber'],'Derechos y deberes van juntos. Incumplir un deber puede tener consecuencias, pero no borra los derechos fundamentales.'),
+   Q('s','deberes','Un estudiante pone música a todo volumen en la biblioteca mientras otros estudian y dice: «es mi derecho». ¿Qué ocurre?',['Abusa de su derecho porque afecta el derecho de otros a estudiar en un ambiente tranquilo','Su derecho es absoluto y nadie puede limitarlo','No hay ningún derecho involucrado','Los demás deberían aguantar porque llegó primero'],'El Art. 95 pide «respetar los derechos ajenos y no abusar de los propios».'),
+   Q('s','derechos','Un docente le niega la entrada a clase a una estudiante por estar embarazada. ¿Qué derechos se vulneran principalmente?',['La educación y la igualdad (no discriminación)','El derecho al voto','La propiedad privada','La libre movilidad internacional'],'La educación es un derecho (Art. 67) y todas las personas son iguales ante la ley (Art. 13). El embarazo no es motivo para excluirla.'),
+   Q('j','deberes','Un estudiante afirma: «Mi derecho a la educación me permite ignorar el manual de convivencia». ¿Cuál es la mejor respuesta?',['El manual establece deberes y acuerdos que hacen posible ejercer el derecho a la educación de todos','Tiene razón: los derechos están por encima de cualquier norma','El manual solo aplica a los docentes','Los deberes solo existen fuera del colegio'],'Las normas de convivencia garantizan que el derecho a educarse pueda ejercerse en igualdad por todas las personas.'),
+   Q('a','derechos','El agua de tu barrio lleva semanas suspendida sin explicación. ¿Qué mecanismo permite pedir una respuesta formal a la entidad?',['Presentar un derecho de petición por escrito','Agredir a los funcionarios hasta que respondan','Publicar insultos en redes sociales','Esperar sin hacer nada'],'El derecho de petición (Art. 23) obliga a la entidad a responder dentro de los plazos de ley.'),
+   Q('r','derechos','RETO: Una estudiante fue excluida de una actividad escolar por su religión. ¿Qué DOS acciones corresponden a un ejercicio responsable de derechos y deberes?',['Informar al docente o al Comité de Convivencia, recordando que la igualdad (Art. 13) protege a todos','Acompañar a la compañera y apoyarla para presentar su queja por el conducto regular (por ejemplo, el personero estudiantil)','Aislar a quien la excluyó','Esperar a que se arregle sola','Responder con insultos'],'Los derechos se reclaman por vías pacíficas e institucionales: comité de convivencia, personero, coordinación.',2)
+  ]},
+ {name:'Puente de la Paz',topic:'Resolución pacífica de conflictos',tick:135,
+  story:'El Puente de la Paz se rompió en medio del patio del colegio: demasiados rumores, empujones y malentendidos. Calma te necesita para reunir el Cristal de la Paz. Cada respuesta correcta repara una tabla del puente.',
+  items:[
+   Q('c','conflictos','Un conflicto escolar es…',['Una situación de desacuerdo o de intereses opuestos que puede resolverse pacíficamente','Siempre una forma de violencia','Algo que solo ocurre por mala educación','Una agresión repetida contra una persona'],'Un conflicto no es lo mismo que violencia. Manejado bien, puede fortalecer la relación. La agresión repetida es otra cosa: acoso.'),
+   Q('c','conflictos','¿Qué mecanismo cuenta con un tercero neutral que ayuda a las partes a construir su propio acuerdo, sin imponer una decisión?',['La mediación','El arbitraje, donde el tercero decide','La imposición de reglas por la fuerza','La evasión del problema'],'En la mediación el tercero facilita el diálogo; en el arbitraje, en cambio, el tercero decide.'),
+   Q('s','conflictos','Dos compañeros discuten por un trabajo en grupo: uno dice que el otro no cumplió. ¿Qué es lo más adecuado?',['Dialogar con calma, escuchar la versión del otro y acordar compromisos claros','Gritarle para que reaccione','Excluirlo del grupo sin hablar','Acusarlo ante todo el curso'],'Escuchar, expresar lo que sientes sin atacar y pactar compromisos son pasos de una resolución pacífica.'),
+   Q('s','convivencia','Desde hace tres semanas, un grupo le pone apodos ofensivos a un compañero y lo excluye todos los días. ¿Cómo se clasifica mejor esta situación?',['Acoso escolar, porque es una agresión repetida e intencional','Un conflicto normal que se resuelve solo','Una broma entre amigos','Una simple diferencia de gustos'],'La Ley 1620 de 2013 describe el acoso escolar como una conducta negativa, intencional y repetida. Debe reportarse a la ruta de atención.'),
+   Q('j','convivencia','¿Por qué, ante un caso de acoso escolar, no basta con «no meterse»?',['Porque quien observa en silencio puede reforzar la agresión; actuar o informar protege a la víctima','Porque el acoso solo afecta a los agresores','Porque la víctima siempre se lo busca','Porque los testigos deben pelear con el agresor'],'El rol de los testigos es clave: informar a un adulto o al comité protege, y hacerlo no implica usar violencia.'),
+   Q('a','conflictos','En tu equipo de fútbol del barrio dos jugadores discuten por una decisión del árbitro y la discusión escala a empujones. ¿Cómo aplicas lo aprendido?',['Intervenir con calma para separar, proponer una pausa para dialogar y pedir apoyo del entrenador si hace falta','Animar la pelea para que se resuelva rápido','Grabarla para publicarla','Irte sin decir nada'],'Detener la escalada, buscar calma y apoyarte en una figura de autoridad son pasos clave en cualquier contexto.'),
+   Q('r','conflictos','RETO: Dos estudiantes pelean por un rumor y te piden que seas mediador. ¿Qué DOS acciones son propias de una buena mediación?',['Dar a cada parte la oportunidad de hablar sin interrumpir, manteniéndote imparcial','Ayudarles a identificar lo que cada uno necesita y a construir un acuerdo que ambos puedan cumplir','Decidir quién tiene la razón y castigar al otro','Tomar partido por tu mejor amigo','Contar al curso lo que dijo cada uno'],'Un mediador es imparcial, facilita el diálogo y no impone una solución ni divulga lo hablado.',2)
+  ]},
+ {name:'Torre de la Convivencia',topic:'Ciudadanía en contextos nuevos',tick:120,
+  story:'Los cuatro cristales brillan, pero la Torre de la Convivencia solo se enciende con el último. Nova te propone pruebas nuevas: redes sociales, elecciones, protesta pacífica y situaciones del barrio. ¡Es el nivel final!',
+  items:[
+   Q('c','participacion','En el gobierno escolar, ¿quién es el personero estudiantil?',['Un estudiante del último grado, elegido por los estudiantes, que promueve sus derechos y deberes','Un docente designado por el rector','El padre de familia con más antigüedad','El rector del colegio'],'Según el Decreto 1860 de 1994, el personero es un estudiante del último grado, elegido por sus compañeros.'),
+   Q('c','derechos','Se dice que los derechos humanos son universales, inalienables e indivisibles. ¿Qué significa «universales»?',['Que le pertenecen a todas las personas, sin importar su origen, sexo, religión u opinión','Que solo se aplican en los países que los firmaron','Que se pueden perder si una persona comete una falta','Que dependen de la edad o de la riqueza de cada persona'],'Universales: todas las personas los tienen por ser personas. Inalienables: no se pueden quitar. Indivisibles: están conectados y ninguno vale menos que otro.'),
+   Q('s','convivencia','Un perfil anónimo humilla a una compañera con fotos manipuladas. ¿Qué es y qué corresponde hacer?',['Ciberacoso: guardar evidencias, reportar en la plataforma e informar al colegio y a un adulto de confianza','Una broma digital sin consecuencias','Responder con otro perfil falso','Borrar tus propias cuentas'],'La Ley 1620 incluye el ciberacoso. Conservar pruebas y activar la ruta de atención es lo adecuado.'),
+   Q('s','participacion','Antes de la elección del personero, un candidato ofrece regalos a cambio de votos. ¿Qué principio democrático se vulnera?',['El voto libre, secreto e informado','La libertad de cultos','La libre movilidad','Ninguno, porque es solo un regalo'],'Comprar votos condiciona la decisión y rompe la libertad de elegir.'),
+   Q('j','participacion','¿Por qué participar en decisiones del colegio o del barrio fortalece la democracia?',['Porque permite que las decisiones recojan distintas voces y que la ciudadanía construya y vigile lo común','Porque obliga a todos a pensar igual','Porque quita responsabilidad a las autoridades','Porque evita que existan desacuerdos'],'La participación diversa hace que las decisiones representen a más personas y permite el control ciudadano.'),
+   Q('a','derechos','Jóvenes del barrio quieren reclamar por la falta de iluminación en un parque. ¿Qué forma de protesta es coherente con los derechos y deberes ciudadanos?',['Organizar una manifestación pacífica y presentar un derecho de petición a la alcaldía','Bloquear la vía con violencia y dañar el mobiliario','Insultar a funcionarios en redes','No hacer nada'],'Reunirse y manifestarse pública y pacíficamente es un derecho (Art. 37), y se complementa con vías formales como el derecho de petición.'),
+   Q('r','convivencia','RETO FINAL: Ves que un compañero amenaza e insulta a otro, con empujones, a la salida de clase. ¿Qué DOS acciones son las más adecuadas y seguras?',['Informar de inmediato a un docente, coordinador o al Comité Escolar de Convivencia','Acompañar y apoyar a la persona afectada para que reciba atención y se active la ruta de atención','Intervenir golpeando al agresor','Grabar y difundir el video en redes','Esperar a ver si se arregla solo'],'Se protege a la víctima y se informa a los adultos responsables. Responder con violencia o exponer el video agrava el daño.',2)
+  ]}
+];
+
+/* ======== ESTADO Y ALMACENAMIENTO ======== */
+let store={teams:{},current:null,sfx:true,music:false};
+try{const raw=localStorage.getItem(LS);if(raw)store=Object.assign(store,JSON.parse(raw))}catch(e){}
+function save(){try{localStorage.setItem(LS,JSON.stringify(store))}catch(e){}}
+let remote={};let DB=null;let team=null;let run=null;let teacherAuthed=false;
+const openSet=new Set();
+
+function allTeams(){
+  const m={};
+  Object.keys(store.teams).forEach(id=>{m[id]=store.teams[id]});
+  Object.keys(remote).forEach(id=>{
+    const r=remote[id],l=m[id];
+    if(!l){m[id]=r;return}
+    let pick=(r.updated||0)>(l.updated||0)?r:l;
+    const dr=r.docente,dl=l.docente;
+    const d=dr&&dl?((dr.at||0)>=(dl.at||0)?dr:dl):(dr||dl||null);
+    m[id]=Object.assign({},pick,{docente:d});
+  });
+  return Object.values(m);
+}
+function newTeam(name,members){
+  const slug=name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,24)||'equipo';
+  return {id:slug+'-'+Math.random().toString(36).slice(2,6),name,members,created:Date.now(),updated:Date.now(),levels:{},docente:null};
+}
+const pushing={};
+function pushTeam(t){
+  if(!DB)return;
+  const id=t.id;
+  pushing[id]=(pushing[id]||Promise.resolve()).then(async()=>{
+    try{
+      const ref=DB.doc('torneo/'+id);
+      const snap=await ref.get();
+      const body=JSON.parse(JSON.stringify(t));delete body.docente;
+      if(snap.exists)await ref.update(body);else await ref.set(body);
+      setLive(true);
+    }catch(e){setLive(false)}
+  });
+}
+async function initDB(){
+  try{
+    if(!window.claude||!window.claude.use)return;
+    DB=await window.claude.use('db');
+    if(!DB)return;
+    DB.collection('torneo').onSnapshot(snap=>{
+      const r={};snap.docs.forEach(d=>{r[d.id]=d.data()});
+      remote=r;setLive(true);onRemote();
+    },()=>{setLive(false)});
+    Object.keys(store.teams).forEach(id=>pushTeam(store.teams[id]));
+  }catch(e){DB=null;setLive(false)}
+}
+function setLive(on){
+  const f=$('#live-flag');if(!f)return;
+  f.className='live'+(on&&DB?'':' off');
+  f.textContent=on&&DB?'En vivo con todos los equipos':'Solo este dispositivo';
+}
+function onRemote(){
+  if(!$('#s-board').hidden)renderBoard();
+  if(!$('#s-home').hidden)renderHome();
+  if(!$('#s-teacher').hidden&&teacherAuthed){
+    const a=document.activeElement;
+    if(!(a&&a.closest&&a.closest('#s-teacher details'))&&!($('#modal')&&!$('#modal').hidden))renderTeacher();
+  }
+}
+
+/* ======== EVALUACIÓN ======== */
+function summarize(t){
+  let c=0,n=0,ac=0,an=0,jc=0,jn=0,score=0,passed=0;const tags={};
+  Object.keys(t.levels||{}).forEach(k=>{
+    const L=t.levels[k];score+=L.best||0;if(L.passed)passed++;c+=L.c||0;n+=L.t||0;
+    Object.keys(L.tags||{}).forEach(g=>{tags[g]=tags[g]||[0,0];tags[g][0]+=L.tags[g][0];tags[g][1]+=L.tags[g][1]});
+    const ty=L.types||{};
+    ['a','r'].forEach(x=>{if(ty[x]){ac+=ty[x][0];an+=ty[x][1]}});
+    if(ty.j){jc+=ty.j[0];jn+=ty.j[1]}
+  });
+  const acc=n?c/n*100:0,apl=an?ac/an*100:0,jus=jn?jc/jn*100:0;
+  let rating=null;
+  if(n>0){
+    if(acc>=90&&apl>=80)rating=5;else if(acc>=75&&jus>=60)rating=4;else if(acc>=60)rating=3;else if(acc>=40)rating=2;else rating=1;
+  }
+  return {score,passed,c,n,acc,apl,jus,rating,tags,final:t.docente&&t.docente.nota?t.docente.nota:rating};
+}
+function levelUnlocked(t,n){return n===1||!!(t.levels[n-1]&&t.levels[n-1].passed)}
+function crystalCode(t){
+  const s=summarize(t);const str=t.id+'|'+s.score;let h=7;
+  for(let i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))>>>0;
+  return 'ENS-'+h.toString(36).toUpperCase().padStart(6,'0').slice(0,6);
+}
+
+/* ======== SONIDO ======== */
+let AC=null;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,d,type,v,delay,force){
+  if(!store.sfx&&!force)return;const a=ac();if(!a)return;
+  const t=a.currentTime+(delay||0),o=a.createOscillator(),g=a.createGain();
+  o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v||0.08,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+(d||0.12));
+  o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+(d||0.12)+0.03);
+}
+const sfx={
+  eat:()=>tone(660,.08,'triangle',.09),
+  good:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.16,'triangle',.09,i*.08)),
+  bad:()=>{tone(180,.25,'sawtooth',.06);tone(140,.3,'sawtooth',.06,.1)},
+  crash:()=>{tone(120,.2,'square',.07)},
+  win:()=>[523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,.22,'triangle',.09,i*.09)),
+  click:()=>tone(440,.05,'sine',.05)
+};
+const SEQ=[261.6,329.6,392,523.3,392,329.6,293.7,349.2,440,587.3,440,349.2];
+let mi=0,mt=null;
+function musicTick(){
+  if(!store.music||document.hidden)return;
+  const a=ac();if(!a)return;
+  const f=SEQ[mi%SEQ.length];mi++;
+  tone(f,.28,'triangle',.035,0,true);
+  if(mi%4===1)tone(f/2,.5,'sine',.04,0,true);
+}
+function setMusic(on){
+  store.music=on;save();
+  if(on){ac();if(!mt)mt=setInterval(musicTick,280)}else if(mt){clearInterval(mt);mt=null}
+  const b=$('#b-music');b.textContent='Música: '+(on?'sí':'no');b.setAttribute('aria-pressed',on);b.classList.toggle('on',on);
+}
+
+/* ======== GRÁFICOS ======== */
+function heroSVG(h){
+  const c=h.color,s=h.skin,hr=h.hair;
+  const back=[
+    '',
+    `<path d="M34 52Q30 84 42 98H78Q90 84 86 52Q86 22 60 22Q34 22 34 52Z" fill="${hr}"/>`,
+    `<g fill="${hr}"><circle cx="33" cy="60" r="6"/><circle cx="31" cy="72" r="6"/><circle cx="33" cy="84" r="6"/><circle cx="87" cy="60" r="6"/><circle cx="89" cy="72" r="6"/><circle cx="87" cy="84" r="6"/></g>`,
+    `<path d="M35 52Q35 78 43 80H77Q85 78 85 52Q85 22 60 22Q35 22 35 52Z" fill="${hr}"/>`,
+    `<path d="M80 32Q106 34 102 72Q100 88 88 94Q96 66 80 50Z" fill="${hr}"/>`
+  ][h.hs];
+  const acc=[
+    `<circle cx="60" cy="17" r="9" fill="${hr}"/><path d="M60 10l2 5 5 .5-4 3 1.5 5-4.5-3-4.5 3 1.5-5-4-3 5-.5z" fill="#ffd25e"/>`,
+    `<path d="M38 40Q60 26 82 40" stroke="${c}" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+    '',
+    `<path d="M74 33q12-5 11 7-11 2-11-7z" fill="${c}"/>`,
+    `<path d="M45 30l5-10 4 7 6-10 6 10 4-7 5 10z" fill="#ffd25e"/>`
+  ][h.hs];
+  return `<svg viewBox="0 0 120 120" role="img" aria-label="${esc(h.name)}">
+    <path d="M30 118L40 76H80L90 118Z" fill="${c}" opacity=".5"/>
+    ${back}
+    <path d="M42 118V84Q42 74 60 74Q78 74 78 84V118Z" fill="${c}"/>
+    <rect x="54" y="62" width="12" height="14" rx="5" fill="${s}"/>
+    <circle cx="60" cy="48" r="22" fill="${s}"/>
+    <path d="M37 50Q36 24 60 24Q84 24 83 50Q74 36 60 37Q46 36 37 50Z" fill="${hr}"/>
+    ${acc}
+    <ellipse cx="51" cy="52" rx="3" ry="4" fill="#1a0b3b"/><ellipse cx="69" cy="52" rx="3" ry="4" fill="#1a0b3b"/>
+    <circle cx="52" cy="50.5" r="1.1" fill="#fff"/><circle cx="70" cy="50.5" r="1.1" fill="#fff"/>
+    <circle cx="46" cy="60" r="4" fill="#ff5fb0" opacity=".35"/><circle cx="74" cy="60" r="4" fill="#ff5fb0" opacity=".35"/>
+    <path d="M53 62Q60 68 67 62" stroke="#1a0b3b" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="60" cy="94" r="8" fill="#fff" opacity=".92"/><path d="M60 88l1.8 4 4.2.4-3.2 2.8 1 4.2-3.8-2.3-3.8 2.3 1-4.2-3.2-2.8 4.2-.4z" fill="${c}"/>
+  </svg>`;
+}
+function gemSVG(color){
+  return `<svg class="gem" viewBox="0 0 100 100" aria-hidden="true" style="--c:${color}"><path d="M50 6L88 36L50 94L12 36Z" fill="${color}"/><path d="M50 6L66 36H34Z" fill="#fff" opacity=".45"/><path d="M12 36H88L50 94Z" fill="#000" opacity=".12"/><path d="M34 36L50 94L66 36" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"/></svg>`;
+}
+function bigSnakeSVG(){
+  return `<svg viewBox="0 0 200 200"><defs><linearGradient id="lgBig" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#4db5ff"/><stop offset=".5" stop-color="#a56bff"/><stop offset="1" stop-color="#ff5fb0"/></linearGradient></defs>
+  <path d="M30 160c-18-34 22-44 40-58s-14-34 18-52 66-8 66 24c0 26-30 30-30 52" fill="none" stroke="url(#lgBig)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="132" cy="76" r="8" fill="#fff"/><circle cx="134" cy="76" r="3.6" fill="#1a0b3b"/>
+  <circle cx="156" cy="72" r="8" fill="#fff"/><circle cx="158" cy="72" r="3.6" fill="#1a0b3b"/>
+  <path d="M152 100l12 8m-12-8l14-2" stroke="#ff5fb0" stroke-width="3" stroke-linecap="round"/>
+  <path d="M142 38l4 9 10 1-8 6 3 10-9-6-9 6 3-10-8-6 10-1z" fill="#ffd25e"/></svg>`;
+}
+function shieldSVG(on){return `<svg class="shield${on?'':' off'}" viewBox="0 0 22 24" aria-hidden="true"><path d="M11 1l9 3v7c0 6-4 10-9 12C6 21 2 17 2 11V4z" fill="#4db5ff" stroke="#fff" stroke-width="1.5"/><path d="M11 6l1.6 3.3 3.6.5-2.6 2.5.6 3.6L11 14.2 7.8 15.9l.6-3.6L5.8 9.8l3.6-.5z" fill="#fff"/></svg>`}
+
+/* ======== PANTALLAS ======== */
+const g={active:false,snake:[],dir:{x:1,y:0},queue:[],tokens:[],grow:0,acc:0,last:0,q:null,found:0,wrong:0,t0:null,len:3,flash:0,parts:[]};
+function show(id){
+  $$('main > section').forEach(s=>{s.hidden=s.id!==id});
+  g.active=(id==='s-game');
+  if(!g.active&&run&&run.state==='playing')run.state='paused';
+  window.scrollTo(0,0);
+}
+function renderHome(){
+  $('#hero-art').innerHTML=bigSnakeSVG();
+  const list=allTeams().sort((a,b)=>(b.updated||0)-(a.updated||0));
+  $('#team-list').innerHTML=list.length?list.map(t=>{const s=summarize(t);return `<button class="team-pick" data-act="continue" data-id="${esc(t.id)}"><span><b>${esc(t.name)}</b><br><span class="small muted">${s.passed} de 5 niveles · ${s.score} puntos</span></span><span class="chip">Continuar</span></button>`}).join(''):'<p class="muted small">Aún no hay equipos registrados. Crea el primero a la izquierda.</p>';
+}
+function openTeam(t){
+  team=t;store.teams[t.id]=t;store.current=t.id;save();renderMap();show('s-map');
+}
+function renderMap(){
+  const s=summarize(team);
+  $('#map-team').textContent=team.name;
+  $('#map-members').textContent=team.members.length?team.members.join(' · '):'';
+  $('#map-stats').innerHTML=`<div class="stat"><span class="up">Puntos</span><b>${s.score}</b></div><div class="stat"><span class="up">Niveles</span><b>${s.passed}/5</b></div><div class="stat"><span class="up">Calificación</span><b>${s.final?s.final+' · '+RATING[s.final]:'—'}</b></div>`;
+  let now=0;
+  for(let i=1;i<=5;i++){if(!(team.levels[i]&&team.levels[i].passed)){now=i;break}}
+  $('#road').innerHTML=LEVELS.map((lv,i)=>{
+    const n=i+1,L=team.levels[n]||null,h=HEROES[i];
+    const open=levelUnlocked(team,n),done=!!(L&&L.passed);
+    const cls=done?'done':(open?(n===now?'now':''):'lock');
+    const meta=L?`<span class="chip line">Mejor: ${L.best} pts</span><span class="chip line">Intentos: ${L.attempts}</span>`:'';
+    return `<li class="lvl ${cls}" style="--c:${h.color}"><div class="node">${n}</div>${n===now?`<svg class="snake-here" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="22" fill="#4db5ff"/><circle cx="32" cy="32" r="12" fill="#ff5fb0"/><circle cx="38" cy="28" r="4" fill="#fff"/><circle cx="39" cy="28" r="1.8" fill="#1a0b3b"/></svg>`:''}
+      <div class="card">${heroSVG(h)}<div><h3>${esc(lv.name)}</h3><p class="muted small">${esc(h.name)} · ${esc(lv.topic)}</p><div class="meta">${open?'':'<span class="chip line">Bloqueado</span>'}${done?'<span class="chip" style="--c:var(--good)">Cristal logrado</span>':''}${meta}</div></div>
+      <button class="btn ${open&&!done?'primary':''}" data-act="intro" data-lvl="${n}" ${open?'':'disabled'}>${done?'Repetir':'Jugar'}</button></div></li>`;
+  }).join('');
+  $('#map-final').innerHTML=s.passed===5?finalCard(team):'';
+}
+function finalCard(t){
+  const s=summarize(t),code=crystalCode(t),f=s.final;
+  return `<div class="cert" style="margin-top:24px"><div class="row" style="gap:18px"><div class="ratebox">${f}</div><div><p class="up">Torre de la Convivencia encendida</p><h2 style="font-size:36px">${esc(t.name)}: ${RATING[f]}</h2><p class="muted">Aciertos a la primera: ${Math.round(s.acc)}% · Contextos nuevos: ${Math.round(s.apl)}%</p></div></div>
+  <p style="margin-top:12px">Código de cristal para tu pasaporte del torneo:</p><span class="code">${code}</span><p class="small muted">Preséntalo al docente para registrar tu insignia de Ciudadana Superpoderosa en los demás juegos del torneo.</p></div>`;
+}
+
+function openIntro(n){
+  const lv=LEVELS[n-1],h=HEROES[n-1];
+  run={level:n,state:'idle'};
+  $('#intro-card').style.setProperty('--c',h.color);
+  $('#intro-card').innerHTML=`<div>${heroSVG(h)}</div><div><p class="up">Nivel ${n} de 5 · ${esc(lv.topic)}</p><h2 style="color:${h.color}">${esc(lv.name)}</h2>
+   <div class="bubble"><b>${esc(h.name)}:</b> ${esc(lv.story)}</div>
+   <div class="rules"><div><b>Come la gema correcta</b>Cada gema trae una letra. Elige la que responde bien.</div><div><b>Cuida tus 3 escudos</b>Una respuesta incorrecta o un choque te cuesta un escudo.</div><div><b>Sin muros ni cola</b>Chocar con el borde o con tu cuerpo reinicia a Chispa.</div></div>
+   <div class="row"><button class="btn primary" data-act="start" data-lvl="${n}">¡A jugar!</button><button class="btn ghost" data-act="go-map">Volver al camino</button></div></div>`;
+  show('s-intro');
+}
+
+/* ======== JUEGO ======== */
+const cv=$('#board'),ctx=cv.getContext('2d');
+const HEAD=[255,95,176],TAIL=[77,181,255];
+const lerp=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t));
+function startRun(n){
+  const lv=LEVELS[n-1];
+  const items=lv.items.slice(0,-1);
+  run={level:n,idx:0,score:0,lives:3,streak:0,rec:[],tick:lv.tick,state:'waiting',items:shuffle(items).concat([lv.items[lv.items.length-1]]),begun:Date.now()};
+  g.len=3;g.parts=[];
+  $('#board-box').style.setProperty('--c',HEROES[n-1].color);
+  show('s-game');
+  loadItem();
+}
+function resetSnake(len){
+  const y=GRID>>1,hx=2+len;g.snake=[];
+  for(let i=0;i<len;i++)g.snake.push({x:hx-i,y});
+  g.dir={x:1,y:0};g.queue=[];g.grow=0;g.acc=0;
+}
+function placeTokens(){
+  const n=g.q.opts.length;g.tokens=[];
+  const occ=new Set(g.snake.map(p=>p.x+','+p.y));
+  [[5,4],[3,2],[0,0]].forEach(([hd,td])=>{
+    let tries=0;
+    while(g.tokens.length<n&&tries<3000){
+      tries++;
+      const x=1+rand(GRID-2),y=1+rand(GRID-2),k=x+','+y;
+      if(occ.has(k))continue;
+      const h=g.snake[0];
+      if(Math.abs(x-h.x)+Math.abs(y-h.y)<hd)continue;
+      if(g.tokens.some(t=>Math.abs(t.x-x)+Math.abs(y-t.y)<td))continue;
+      g.tokens.push({x,y,opt:g.tokens.length});occ.add(k);
+    }
+  });
+}
+function loadItem(){
+  const item=run.items[run.idx];
+  const opts=shuffle(item.o.map((text,i)=>({text,correct:i<item.k}))).map((o,i)=>Object.assign(o,{letter:'ABCDE'[i],color:COLORS[i],gone:false}));
+  g.q={item,opts,multi:item.k>1};g.found=0;g.wrong=0;g.t0=null;
+  resetSnake(g.len);placeTokens();
+  run.state='waiting';
+  $('#fb').innerHTML='';$('#toast').textContent='';
+  renderHUD();renderQuestion();setOverlay('wait');
+  if(run.idx>0){const hd=$('#hud');if(hd&&hd.scrollIntoView)hd.scrollIntoView({block:'start'})}
+}
+function renderHUD(){
+  const h=HEROES[run.level-1];
+  $('#hud').innerHTML=`<span class="pill" style="border-color:${h.color}">Nivel <b>${run.level}</b> · ${esc(LEVELS[run.level-1].name)}</span>
+  <span class="pill">Pregunta <b>${run.idx+1}</b>/${run.items.length}</span>
+  <span class="pill">Puntos <b>${run.score}</b></span>
+  <span class="pill">Racha <b>${run.streak}</b></span>
+  <span class="pill" aria-label="Escudos: ${run.lives}"><span class="shields">${[0,1,2].map(i=>shieldSVG(i<run.lives)).join('')}</span></span>
+  <span class="grow"></span><button class="btn" data-act="pause">Pausa</button><button class="btn ghost" data-act="exit">Salir</button>`;
+}
+function renderQuestion(){
+  const it=g.q.item,color=HEROES[run.level-1].color;
+  $('#qcard').innerHTML=`<div class="row"><span class="chip" style="--c:${color}">${TYPES[it.t]}</span><span class="chip line">${TAGS[it.g]}</span></div>
+  <p class="qtext">${esc(it.q)}</p>
+  <ul class="opts">${g.q.opts.map(o=>`<li data-l="${o.letter}" class="${o.gone?'gone':''}"><span class="ltr" style="--c:${o.color}">${o.letter}</span><span>${esc(o.text)}</span></li>`).join('')}</ul>
+  <p class="hint">${g.q.multi?'Este reto tiene DOS respuestas correctas: come las dos gemas. ':''}Mueve a Chispa hasta la gema con la letra de tu respuesta.</p>`;
+}
+function setOverlay(mode){
+  const ov=$('#ov');
+  if(mode==='none'){ov.hidden=true;ov.innerHTML='';return}
+  ov.hidden=false;
+  if(mode==='wait'){ov.className='ov';ov.innerHTML='<div class="msg">Lee la pregunta. Pulsa una flecha o desliza para empezar.</div>'}
+  if(mode==='pause'){ov.className='ov paused';ov.innerHTML='<div class="msg">Juego en pausa</div><button class="btn primary" data-act="resume">Continuar</button>'}
+  if(mode==='crash'){ov.className='ov';ov.innerHTML='<div class="msg">¡Choque! Pierdes un escudo. Pulsa una flecha para seguir.</div>'}
+}
+function setDir(dx,dy){
+  if(!run||!g.active)return;
+  if(run.state==='waiting'||(run.state==='crashed')){
+    run.state='playing';if(g.t0==null)g.t0=performance.now();setOverlay('none');ac();
+  }
+  if(run.state!=='playing')return;
+  const last=g.queue.length?g.queue[g.queue.length-1]:g.dir;
+  if(last.x===dx&&last.y===dy)return;
+  if(last.x===-dx&&last.y===-dy)return;
+  if(g.queue.length<2)g.queue.push({x:dx,y:dy});
+}
+function step(){
+  if(g.queue.length){const d=g.queue.shift();if(!(d.x===-g.dir.x&&d.y===-g.dir.y))g.dir=d}
+  const h=g.snake[0],nx=h.x+g.dir.x,ny=h.y+g.dir.y;
+  if(nx<0||ny<0||nx>=GRID||ny>=GRID)return crash();
+  const body=g.grow>0?g.snake:g.snake.slice(0,-1);
+  if(body.some(p=>p.x===nx&&p.y===ny))return crash();
+  g.snake.unshift({x:nx,y:ny});
+  if(g.grow>0)g.grow--;else g.snake.pop();
+  const ti=g.tokens.findIndex(t=>t.x===nx&&t.y===ny);
+  if(ti>=0)eatToken(ti);
+}
+function burst(x,y,color){
+  if(reduce)return;
+  for(let i=0;i<14;i++){const a=Math.random()*6.283,s=40+Math.random()*90;g.parts.push({x:x*CELL+CELL/2,y:y*CELL+CELL/2,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.6,color})}
+}
+function crash(){
+  g.flash=1;sfx.crash();
+  run.lives--;run.score=Math.max(0,run.score-10);run.streak=0;
+  g.len=3;
+  renderHUD();
+  if(run.lives<=0){run.state='over';setTimeout(()=>endLevel(false),700);return}
+  resetSnake(3);run.state='crashed';setOverlay('crash');
+  $('#toast').textContent='Chocaste: −1 escudo y −10 puntos.';
+}
+function eatToken(ti){
+  const t=g.tokens[ti],o=g.q.opts[t.opt];
+  g.tokens.splice(ti,1);burst(t.x,t.y,o.color);sfx.eat();
+  if(!g.q.multi){
+    if(o.correct){g.grow++;answered(true)}else{answered(false)}
+    return;
+  }
+  o.gone=true;
+  if(o.correct){
+    g.found++;g.grow++;
+    if(g.found>=g.q.item.k){answered(g.wrong===0)}else{$('#toast').textContent='¡Una correcta! Falta una más.';renderQuestion()}
+  }else{
+    g.wrong++;run.lives--;run.streak=0;sfx.bad();renderHUD();renderQuestion();
+    if(run.lives<=0){answered(false,true)}else{$('#toast').textContent='Esa no es: −1 escudo. Sigue buscando.'}
+  }
+}
+function answered(ok,noCost){
+  run.state='feedback';
+  const it=g.q.item,secs=g.t0?(performance.now()-g.t0)/1000:30;
+  run.rec.push({g:it.g,t:it.t,ok});
+  let pts=0;
+  if(ok){
+    const base=it.t==='r'?200:100,speed=Math.max(0,50-2*Math.floor(secs)),streak=Math.min(50,run.streak*10);
+    pts=base+speed+streak;run.score+=pts;run.streak++;g.len=Math.min(g.len+1,9);sfx.good();
+  }else{
+    run.streak=0;
+    if(!g.q.multi&&!noCost)run.lives--;
+    sfx.bad();
+  }
+  $('#toast').textContent='';
+  renderHUD();
+  const corr=g.q.opts.filter(o=>o.correct).map(o=>o.letter+') '+o.text).join(' · ');
+  const last=run.idx>=run.items.length-1,over=run.lives<=0;
+  const next=over?'<button class="btn primary" data-act="finish" data-ok="0">Ver resultado</button>':last?'<button class="btn primary" data-act="finish" data-ok="1">Terminar nivel</button>':'<button class="btn primary" data-act="next">Siguiente pregunta</button>';
+  $('#fb').innerHTML=`<div class="fb ${ok?'':'bad'}"><h3>${ok?'¡Correcto!':'No era esa'} ${ok?`<span class="pts">+${pts} puntos</span>`:''}</h3>
+   ${ok?'':`<p><b>Respuesta correcta:</b> ${esc(corr)}</p>`}<p>${esc(it.e)}</p>${next}</div>`;
+  const btn=$('#fb .btn');if(btn)btn.focus({preventScroll:false});
+  setOverlay('none');
+}
+function nextItem(){run.idx++;loadItem()}
+function endLevel(passed){
+  if(!run||run.done)return;run.done=true;
+  const lv=run.level;let bonus=0;
+  if(passed){bonus=run.lives*50;run.score+=bonus}
+  const L=team.levels[lv]||{passed:false,best:0,attempts:0,c:0,t:0,tags:{},types:{}};
+  L.attempts++;if(passed)L.passed=true;
+  if(run.score>=(L.best||0)||!L.t){
+    L.best=run.score;L.c=run.rec.filter(r=>r.ok).length;L.t=run.rec.length;L.tags={};L.types={};
+    run.rec.forEach(r=>{
+      L.tags[r.g]=L.tags[r.g]||[0,0];L.tags[r.g][1]++;if(r.ok)L.tags[r.g][0]++;
+      L.types[r.t]=L.types[r.t]||[0,0];L.types[r.t][1]++;if(r.ok)L.types[r.t][0]++;
+    });
+  }
+  team.levels[lv]=L;team.updated=Date.now();store.teams[team.id]=team;save();pushTeam(team);
+  if(passed)sfx.win();else sfx.bad();
+  renderResult(passed,bonus);show('s-result');
+}
+function renderResult(passed,bonus){
+  const lv=run.level,h=HEROES[lv-1],c=run.rec.filter(r=>r.ok).length,t=run.rec.length;
+  const tags={};run.rec.forEach(r=>{tags[r.g]=tags[r.g]||[0,0];tags[r.g][1]++;if(r.ok)tags[r.g][0]++});
+  const bars=Object.keys(tags).map(k=>{const p=Math.round(tags[k][0]/tags[k][1]*100);return `<div class="bar"><span>${TAGS[k]}</span><i><span style="width:${p}%"></span></i><b>${p}%</b></div>`}).join('');
+  const card=$('#res-card');card.style.setProperty('--c',h.color);
+  card.innerHTML=`<div class="res">${passed?gemSVG(h.color):`<div style="width:150px;text-align:center">${heroSVG(h)}</div>`}
+   <div><p class="up">Nivel ${lv} · ${esc(LEVELS[lv-1].name)}</p><h2>${passed?'¡Cristal conseguido!':'Aún no se enciende el cristal'}</h2>
+   <p class="muted" style="margin:8px 0">${passed?esc(h.name)+' recupera su poder gracias a tu equipo.':'Te quedaste sin escudos. Repasa las explicaciones y vuelve a intentarlo: tu mejor puntaje queda guardado.'}</p>
+   <div class="stats" style="margin:12px 0"><div class="stat"><span class="up">Puntos</span><b>${run.score}</b></div><div class="stat"><span class="up">Aciertos</span><b>${c}/${t}</b></div><div class="stat"><span class="up">Bono escudos</span><b>+${bonus}</b></div></div>
+   <div class="bars">${bars}</div>
+   <div class="row" style="margin-top:18px">${passed&&lv<5?`<button class="btn primary" data-act="intro" data-lvl="${lv+1}">Siguiente nivel</button>`:''}${!passed?`<button class="btn primary" data-act="start" data-lvl="${lv}">Reintentar nivel</button>`:`<button class="btn" data-act="start" data-lvl="${lv}">Jugar otra vez</button>`}<button class="btn ghost" data-act="go-map">Volver al camino</button><button class="btn ghost" data-act="go-board">Ver tabla</button></div></div></div>`;
+  $('#res-final').innerHTML=summarize(team).passed===5?finalCard(team):'';
+}
+
+/* ======== DIBUJO DEL TABLERO ======== */
+function draw(ts,dt){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  for(let y=0;y<GRID;y++)for(let x=0;x<GRID;x++){
+    ctx.fillStyle=(x+y)%2?'#170a38':'#1b0d40';ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
+  }
+  if(!g.q)return;
+  g.tokens.forEach(t=>{
+    const o=g.q.opts[t.opt],cx=t.x*CELL+CELL/2,cy=t.y*CELL+CELL/2,p=reduce?0:Math.sin(ts/260+t.opt)*1.6;
+    ctx.save();ctx.shadowColor=o.color;ctx.shadowBlur=14;ctx.fillStyle=o.color;
+    ctx.beginPath();ctx.arc(cx,cy,CELL*0.44+p,0,6.2832);ctx.fill();ctx.restore();
+    ctx.fillStyle='#1a0b3b';ctx.font='800 15px Nunito, system-ui, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(o.letter,cx,cy+1);
+  });
+  const n=g.snake.length;
+  ctx.lineCap='round';ctx.lineJoin='round';
+  for(let i=n-1;i>=0;i--){
+    const p=g.snake[i],tt=n>1?i/(n-1):0,col='rgb('+lerp(HEAD,TAIL,tt).join(',')+')',r=CELL*(0.47-0.12*tt);
+    const cx=p.x*CELL+CELL/2,cy=p.y*CELL+CELL/2;
+    if(i<n-1){const q=g.snake[i+1];ctx.strokeStyle=col;ctx.lineWidth=r*1.8;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(q.x*CELL+CELL/2,q.y*CELL+CELL/2);ctx.stroke()}
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(cx,cy,r,0,6.2832);ctx.fill();
+  }
+  const h=g.snake[0],hx=h.x*CELL+CELL/2,hy=h.y*CELL+CELL/2,dx=g.dir.x,dy=g.dir.y,px=-dy,py=dx;
+  if(!reduce&&Math.floor(ts/500)%3===0){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(hx+dx*10,hy+dy*10);ctx.lineTo(hx+dx*16,hy+dy*16);ctx.stroke()}
+  [-1,1].forEach(s=>{
+    const ex=hx+dx*3+px*s*5,ey=hy+dy*3+py*s*5;
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ex,ey,4,0,6.2832);ctx.fill();
+    ctx.fillStyle='#1a0b3b';ctx.beginPath();ctx.arc(ex+dx*1.3,ey+dy*1.3,2,0,6.2832);ctx.fill();
+  });
+  for(let i=g.parts.length-1;i>=0;i--){
+    const p=g.parts[i];p.life-=dt/1000;if(p.life<=0){g.parts.splice(i,1);continue}
+    p.x+=p.vx*dt/1000;p.y+=p.vy*dt/1000;
+    ctx.globalAlpha=Math.max(0,p.life/.6);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,3,0,6.2832);ctx.fill();ctx.globalAlpha=1;
+  }
+  if(g.flash>0){ctx.fillStyle='rgba(255,95,176,'+(g.flash*.45)+')';ctx.fillRect(0,0,cv.width,cv.height);g.flash=Math.max(0,g.flash-dt/400)}
+}
+function frame(ts){
+  requestAnimationFrame(frame);
+  const dt=Math.min(100,ts-(g.last||ts));g.last=ts;
+  if(!g.active)return;
+  if(run&&run.state==='playing'){
+    g.acc+=dt;let guard=0;
+    while(g.acc>=run.tick&&guard++<3){g.acc-=run.tick;step();if(run.state!=='playing')break}
+  }
+  draw(ts,dt);
+}
+requestAnimationFrame(frame);
+
+/* ======== TABLA ======== */
+function renderBoard(){
+  const rows=allTeams().map(t=>({t,s:summarize(t)})).sort((a,b)=>b.s.score-a.s.score||b.s.acc-a.s.acc);
+  $('#board-body').innerHTML=rows.length?rows.map((r,i)=>`<tr class="${team&&r.t.id===team.id?'me':''}"><td class="pos">${i+1}</td><td><b>${esc(r.t.name)}</b></td><td>${r.s.passed}/5</td><td><b>${r.s.score}</b></td><td>${r.s.n?Math.round(r.s.acc)+'%':'—'}</td><td>${r.s.final?`<span class="rate">${r.s.final}</span> ${RATING[r.s.final]}${r.t.docente&&r.t.docente.nota?' <span class="small muted">(docente)</span>':''}`:'—'}</td></tr>`).join(''):'<tr><td colspan="6" class="muted">Todavía no hay equipos jugando.</td></tr>';
+}
+
+/* ======== DOCENTE ======== */
+function csvEsc(v){v=String(v==null?'':v);return /[",\n;]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+function buildCSV(){
+  const head=['Equipo','Integrantes','Niveles superados','Puntaje total','Aciertos %','Contextos nuevos %','Justificación %','Calificación sugerida','Calificación docente','Observación docente','Ultima actividad'];
+  const rows=allTeams().map(t=>{const s=summarize(t);return [t.name,(t.members||[]).join(' / '),s.passed,s.score,Math.round(s.acc),Math.round(s.apl),Math.round(s.jus),s.rating||'',t.docente&&t.docente.nota||'',t.docente&&t.docente.coment||'',new Date(t.updated||Date.now()).toLocaleString('es-CO')]});
+  return '﻿'+[head].concat(rows).map(r=>r.map(csvEsc).join(';')).join('\r\n');
+}
+async function exportCSV(){
+  const data=buildCSV();
+  try{
+    const d=await window.claude.use('downloads');
+    if(!d)throw new Error('no');
+    await d.save({filename:'resultados-torneo-ENS.csv',data});
+  }catch(e){
+    if(e&&e.code==='declined')return;
+    openModal(`<h3>Copia los resultados</h3><p class="muted small" style="margin:6px 0 10px">Selecciona todo, copia y pega en una hoja de cálculo (separador: punto y coma).</p><textarea id="csv-box" readonly>${esc(data)}</textarea><div class="row" style="margin-top:12px"><button class="btn primary" data-act="copycsv">Copiar</button><button class="btn ghost" data-act="closemodal">Cerrar</button></div>`);
+  }
+}
+function openModal(html){$('#modal-card').innerHTML=html;$('#modal').hidden=false}
+function closeModal(){$('#modal').hidden=true}
+function renderTeacher(){
+  const sec=$('#s-teacher');
+  if(!teacherAuthed){
+    sec.innerHTML=`<div class="card" style="max-width:480px"><h2 style="font-size:36px;margin-bottom:10px">Panel docente</h2><p class="muted small" style="margin-bottom:12px">Ingresa el PIN para ver el progreso de los equipos.</p><form id="f-pin" class="field"><label for="in-pin">PIN</label><input id="in-pin" type="password" inputmode="numeric" autocomplete="off"><button class="btn primary" type="submit" style="margin-top:10px">Entrar</button><p class="small" id="pin-msg" style="color:var(--bad);margin-top:6px" role="status"></p></form></div>`;
+    return;
+  }
+  const teams=allTeams().map(t=>({t,s:summarize(t)})).sort((a,b)=>b.s.score-a.s.score);
+  const agg={};teams.forEach(x=>Object.keys(x.s.tags).forEach(k=>{agg[k]=agg[k]||[0,0];agg[k][0]+=x.s.tags[k][0];agg[k][1]+=x.s.tags[k][1]}));
+  const aggBars=Object.keys(agg).sort((a,b)=>agg[a][0]/agg[a][1]-agg[b][0]/agg[b][1]).map(k=>{const p=Math.round(agg[k][0]/agg[k][1]*100);return `<div class="bar"><span>${TAGS[k]}</span><i><span style="width:${p}%"></span></i><b>${p}%</b></div>`}).join('');
+  const rated=teams.filter(x=>x.s.final);const avg=rated.length?(rated.reduce((a,x)=>a+x.s.final,0)/rated.length).toFixed(1):'—';
+  sec.innerHTML=`<div class="map-head"><div><p class="up">Seguimiento</p><h2>Panel docente</h2></div><div class="row"><span class="live" id="live-flag2"></span><button class="btn blue" data-act="csv">Exportar resultados</button><button class="btn" data-act="guide">Guía y conceptos</button><button class="btn ghost" data-act="lock">Salir del panel</button></div></div>
+  <div class="stats" style="margin-bottom:18px"><div class="stat"><span class="up">Equipos</span><b>${teams.length}</b></div><div class="stat"><span class="up">Promedio</span><b>${avg}</b></div><div class="stat"><span class="up">Completaron</span><b>${teams.filter(x=>x.s.passed===5).length}</b></div></div>
+  <div class="card" style="margin-bottom:18px"><h3>Conceptos por reforzar</h3><p class="muted small">Del más bajo al más alto, con todos los equipos.</p><div class="bars">${aggBars||'<p class="muted small">Sin datos todavía.</p>'}</div></div>
+  <div class="stack">${teams.length?teams.map(x=>teamRow(x.t,x.s)).join(''):'<p class="muted">Aún no hay equipos.</p>'}</div>`;
+  const lf=$('#live-flag2');lf.className='live'+(DB?'':' off');lf.textContent=DB?'En vivo con todos los equipos':'Solo este dispositivo';
+}
+function teamRow(t,s){
+  const lv=[1,2,3,4,5].map(n=>{const L=t.levels[n];return `<div class="${L&&L.passed?'ok':''}"><span class="up">Nivel ${n}</span><b>${L?L.best:'—'}</b><span class="muted">${L?L.c+'/'+L.t+' · '+L.attempts+' int.':'sin jugar'}</span></div>`}).join('');
+  const bars=Object.keys(s.tags).map(k=>{const p=Math.round(s.tags[k][0]/s.tags[k][1]*100);return `<div class="bar"><span>${TAGS[k]}</span><i><span style="width:${p}%"></span></i><b>${p}%</b></div>`}).join('');
+  const d=t.docente||{};
+  const opts=['<option value="">Usar la sugerida</option>'].concat([1,2,3,4,5].map(n=>`<option value="${n}" ${d.nota===n?'selected':''}>${n} · ${RATING[n]}</option>`)).join('');
+  return `<details class="tm" data-id="${esc(t.id)}" ${openSet.has(t.id)?'open':''}><summary><span><b>${esc(t.name)}</b><br><span class="small muted">${esc((t.members||[]).join(', '))}</span></span><span>${s.passed}/5 niv.</span><span><b>${s.score}</b> pts</span><span>${s.final?`<span class="rate">${s.final}</span>`:'—'}</span></summary>
+  <div class="tm-body"><div><p class="up" style="margin-bottom:8px">Resultados por nivel (mejor intento)</p><div class="lv-mini">${lv}</div><p class="up" style="margin:14px 0 4px">Dominio por concepto</p><div class="bars">${bars||'<span class="muted small">Sin datos</span>'}</div></div>
+  <div><p class="up" style="margin-bottom:8px">Indicadores</p><p class="small">Aciertos a la primera: <b>${Math.round(s.acc)}%</b> · Contextos nuevos y retos: <b>${Math.round(s.apl)}%</b> · Justificar: <b>${Math.round(s.jus)}%</b></p><p class="small">Calificación sugerida: <b>${s.rating?s.rating+' · '+RATING[s.rating]:'—'}</b></p>
+  <div class="field" style="margin-top:12px"><label for="n-${esc(t.id)}">Calificación del docente</label><select id="n-${esc(t.id)}">${opts}</select></div>
+  <div class="field"><label for="c-${esc(t.id)}">Observación</label><textarea id="c-${esc(t.id)}" rows="2" maxlength="300">${esc(d.coment||'')}</textarea></div>
+  <div class="row"><button class="btn primary" data-act="savenote" data-id="${esc(t.id)}">Guardar</button><button class="btn danger" data-act="delteam" data-id="${esc(t.id)}">Eliminar equipo</button></div></div></div></details>`;
+}
+async function saveNote(id){
+  const sel=$('#n-'+CSS.escape(id)),com=$('#c-'+CSS.escape(id));if(!sel)return;
+  const doc=sel.value||com.value?{nota:sel.value?parseInt(sel.value,10):0,coment:com.value.trim(),at:Date.now()}:null;
+  const t=allTeams().find(x=>x.id===id);if(!t)return;
+  if(store.teams[id]){store.teams[id].docente=doc;save()}
+  if(DB){
+    try{const ref=DB.doc('torneo/'+id),snap=await ref.get();
+      if(snap.exists)await ref.update({docente:doc});
+      else{const body=JSON.parse(JSON.stringify(t));body.docente=doc;await ref.set(body)}
+    }catch(e){}
+  }
+  remote[id]=Object.assign({},remote[id]||{},{docente:doc});
+  renderTeacher();
+}
+async function delTeam(id){
+  delete store.teams[id];delete remote[id];if(team&&team.id===id)team=null;if(store.current===id)store.current=null;save();
+  if(DB){try{await DB.doc('torneo/'+id).delete()}catch(e){}}
+  renderTeacher();
+}
+const delArm={};
+function guideHTML(){
+  return `<h2 style="font-size:38px">Guía del docente</h2>
+  <h3>Propósito</h3><p>Fortalecer las competencias ciudadanas de décimo grado: respeto, tolerancia, empatía, derechos y deberes, resolución pacífica de conflictos, convivencia escolar y participación.</p>
+  <h3>Cómo usarlo en clase</h3><ol><li>Forma equipos de 2 a 4 estudiantes. Cada equipo se registra con un nombre.</li><li>Cada nivel dura entre 8 y 12 minutos. Se recomienda un nivel por sesión y una conversación final de cierre.</li><li>Por turnos, un integrante mueve a Chispa y el resto argumenta la respuesta. Roten el control en cada pregunta.</li><li>Lean juntos la explicación que aparece después de cada respuesta. Ahí ocurre el aprendizaje.</li><li>Cierra con una plenaria: ¿qué situación de esta partida se parece a algo que vivimos en el colegio?</li></ol>
+  <h3>Reglas de la culebrita</h3><ul><li>Chispa avanza sin parar; se gira con flechas, WASD o deslizando.</li><li>Comer la gema correcta la hace crecer y suma puntos.</li><li>Chocar con el borde o con su cuerpo cuesta un escudo (hay 3 por nivel).</li><li>El reto final de cada nivel tiene dos respuestas correctas.</li></ul>
+  <h3>Puntaje</h3><ul><li>Respuesta correcta: 100 puntos (200 en el reto), más hasta 50 por rapidez y hasta 50 por racha.</li><li>Choque: −10 puntos. Nivel superado: +50 por cada escudo restante.</li><li>El puntaje del torneo suma el mejor intento de cada nivel.</li></ul>
+  <h3>Escala de evaluación 1 a 5 (sugerida)</h3><ul><li><b>5 Excelente:</b> 90% o más de aciertos a la primera y 80% o más en contextos nuevos y retos.</li><li><b>4 Muy bueno:</b> 75% o más de aciertos y 60% o más en preguntas de justificar.</li><li><b>3 Bueno:</b> 60% o más de aciertos.</li><li><b>2 Satisfactorio:</b> 40% o más.</li><li><b>1 Básico:</b> menos de 40%.</li></ul><p class="small muted">La calificación es una guía: el docente puede reemplazarla y escribir una observación en cada equipo.</p>
+  <h3>Conceptos cubiertos</h3><ul><li><b>Nivel 1:</b> respeto, tolerancia, libre desarrollo de la personalidad (Art. 16), libertad de expresión y sus límites (Arts. 20, 15 y 21).</li><li><b>Nivel 2:</b> empatía, escucha empática, inclusión, empatía en entornos digitales.</li><li><b>Nivel 3:</b> Declaración Universal de los Derechos Humanos (1948), derechos y deberes correlativos (Art. 95), igualdad (Art. 13), educación (Art. 67), derecho de petición (Art. 23).</li><li><b>Nivel 4:</b> conflicto frente a violencia, mediación y arbitraje, acoso escolar y rol de los testigos (Ley 1620 de 2013).</li><li><b>Nivel 5:</b> gobierno escolar y personero (Decreto 1860 de 1994), características de los derechos humanos (universales, inalienables, indivisibles), ciberacoso, protesta pacífica (Art. 37), ruta de atención.</li></ul>
+  <h3>Registro y privacidad</h3><p>Los equipos pueden usar apodos. Los resultados se guardan en el dispositivo; cuando el juego se abre desde el enlace compartido, también se sincronizan para que la tabla sea común. Desde este panel puedes exportar los resultados o eliminar equipos.</p>
+  <h3>Cambiar el PIN</h3><p>El PIN inicial es <b>1234</b>. Para cambiarlo, edita la constante TEACHER_PIN al inicio del script. Es una barrera de aula, no de seguridad.</p>
+  <div class="row" style="margin-top:18px"><button class="btn primary" data-act="closemodal">Cerrar</button></div>`;
+}
+function renderHelp(){
+  $('#help-card').innerHTML=`<h2 style="font-size:38px">Cómo se juega</h2>
+  <h3>Objetivo</h3><p>Recorre los cinco niveles del camino de la convivencia y consigue un cristal de poder en cada uno.</p>
+  <h3>Controles</h3><ul><li>Teclado (PC): flechas o W A S D. Espacio o P para pausar.</li><li>Pantalla táctil: botones en pantalla o deslizar el dedo sobre el tablero.</li></ul>
+  <h3>Reglas</h3><ul><li>La culebrita Chispa se mueve sola; tú decides hacia dónde gira.</li><li>Cada gema tiene una letra. Come la que corresponde a la respuesta correcta.</li><li>Si eliges mal o chocas con un muro o con tu cuerpo, pierdes un escudo. Tienes 3 por nivel.</li><li>En el reto final de cada nivel hay que comer las dos gemas correctas.</li><li>Después de cada respuesta lees una explicación. No te la saltes: ahí está el aprendizaje.</li></ul>
+  <h3>Torneo</h3><ul><li>Tu equipo suma el mejor puntaje de cada nivel.</li><li>La tabla del torneo muestra a todos los equipos.</li><li>Al superar los cinco niveles recibes un código de cristal para tu pasaporte del torneo.</li></ul>
+  <div class="row" style="margin-top:18px"><button class="btn primary" data-act="go-home">Entendido</button></div>`;
+}
+
+/* ======== EVENTOS ======== */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b||b.disabled)return;
+  const a=b.dataset.act;if(a!=='dir')sfx.click();
+  switch(a){
+    case 'go-home':show('s-home');renderHome();break;
+    case 'go-map':if(team){renderMap();show('s-map')}else{show('s-home')}break;
+    case 'go-board':renderBoard();show('s-board');setLive(!!DB);break;
+    case 'go-teacher':renderTeacher();show('s-teacher');break;
+    case 'go-help':renderHelp();show('s-help');break;
+    case 'sfx':store.sfx=!store.sfx;save();b.textContent='Efectos: '+(store.sfx?'sí':'no');b.setAttribute('aria-pressed',store.sfx);break;
+    case 'music':setMusic(!store.music);break;
+    case 'continue':{const t=allTeams().find(x=>x.id===b.dataset.id);if(t){t.levels=t.levels||{};t.members=t.members||[];openTeam(JSON.parse(JSON.stringify(t)))}break}
+    case 'intro':openIntro(parseInt(b.dataset.lvl,10));break;
+    case 'start':startRun(parseInt(b.dataset.lvl,10));break;
+    case 'dir':{const d={u:[0,-1],d:[0,1],l:[-1,0],r:[1,0]}[b.dataset.d];setDir(d[0],d[1]);break}
+    case 'pause':if(run&&run.state==='playing'){run.state='paused';setOverlay('pause')}break;
+    case 'resume':if(run&&run.state==='paused'){run.state='playing';setOverlay('none')}break;
+    case 'next':nextItem();break;
+    case 'finish':endLevel(b.dataset.ok==='1');break;
+    case 'exit':if(run){run.state='idle'}renderMap();show('s-map');break;
+    case 'csv':exportCSV();break;
+    case 'guide':openModal('<div class="guide">'+guideHTML()+'</div>');break;
+    case 'closemodal':closeModal();break;
+    case 'copycsv':{const bx=$('#csv-box');bx.select();try{navigator.clipboard.writeText(bx.value).catch(()=>{})}catch(err){}break}
+    case 'lock':teacherAuthed=false;renderTeacher();break;
+    case 'savenote':saveNote(b.dataset.id);break;
+    case 'delteam':{const id=b.dataset.id;if(delArm[id]){clearTimeout(delArm[id]);delete delArm[id];delTeam(id)}else{b.textContent='Confirmar eliminación';delArm[id]=setTimeout(()=>{delete delArm[id];b.textContent='Eliminar equipo'},4000)}break}
+  }
+});
+document.addEventListener('submit',e=>{
+  if(e.target.id==='f-join'){
+    e.preventDefault();ac();
+    const name=$('#in-team').value.trim().replace(/\s+/g,' ');if(!name)return;
+    const members=$('#in-members').value.split(',').map(s=>s.trim()).filter(Boolean).slice(0,6);
+    const exist=allTeams().find(t=>t.name.toLowerCase()===name.toLowerCase());
+    if(exist){$('#join-msg').textContent='Ya existe un equipo con ese nombre. Elígelo en la lista de la derecha o escribe otro nombre.';return}
+    const t=newTeam(name,members);store.teams[t.id]=t;save();pushTeam(t);
+    $('#f-join').reset();$('#join-msg').textContent='';openTeam(t);
+  }
+  if(e.target.id==='f-pin'){
+    e.preventDefault();
+    if($('#in-pin').value===TEACHER_PIN){teacherAuthed=true;renderTeacher()}else{$('#pin-msg').textContent='PIN incorrecto.'}
+  }
+});
+document.addEventListener('toggle',e=>{
+  const d=e.target;if(d&&d.classList&&d.classList.contains('tm')){if(d.open)openSet.add(d.dataset.id);else openSet.delete(d.dataset.id)}
+},true);
+document.addEventListener('keydown',e=>{
+  const tag=(e.target.tagName||'').toLowerCase();
+  if(tag==='input'||tag==='textarea'||tag==='select')return;
+  if(!g.active||!run)return;
+  const map={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0],W:[0,-1],S:[0,1],A:[-1,0],D:[1,0]};
+  if(map[e.key]){e.preventDefault();setDir(map[e.key][0],map[e.key][1]);return}
+  if(e.key===' '||e.key==='p'||e.key==='P'){
+    if(run.state==='feedback'){return}
+    e.preventDefault();
+    if(run.state==='playing'){run.state='paused';setOverlay('pause')}
+    else if(run.state==='paused'){run.state='playing';setOverlay('none')}
+  }
+  if(e.key==='Enter'&&run.state==='feedback'){const btn=$('#fb .btn');if(btn&&document.activeElement!==btn){e.preventDefault();btn.click()}}
+});
+let tx=0,ty=0;
+const boxEl=$('#board-box');
+boxEl.addEventListener('touchstart',e=>{const t=e.changedTouches[0];tx=t.clientX;ty=t.clientY},{passive:true});
+boxEl.addEventListener('touchend',e=>{
+  const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<18)return;
+  if(Math.abs(dx)>Math.abs(dy))setDir(dx>0?1:-1,0);else setDir(0,dy>0?1:-1);
+},{passive:true});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&run&&run.state==='playing'){run.state='paused';setOverlay('pause')}});
+window.addEventListener('storage',e=>{if(e.key===LS){try{const n=JSON.parse(e.newValue);if(n&&n.teams){store.teams=n.teams;onRemote()}}catch(err){}}});
+
+/* ======== ARRANQUE ======== */
+(function init(){
+  $('#b-sfx').textContent='Efectos: '+(store.sfx?'sí':'no');$('#b-sfx').setAttribute('aria-pressed',store.sfx);
+  store.music=false;const bm=$('#b-music');bm.textContent='Música: no';
+  renderHome();show('s-home');
+  initDB();
+})();
+})();
+</script>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Torneo ENS Divina Providencia · Torneo de la palma</title>
+<style>
+/* ===== PALETA TERROR / LABORATORIO ===== */
+:root{--g:#00ff00;--g2:#00cc00;--k:#000;--k2:#1a1a1a;--r:#8b0000;--r2:#cc0000;--v:#8b008b;--v2:#9932cc}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:radial-gradient(circle at 50% 30%,#1a0a1f,#000 70%);color:#c8ffc8;font-family:"Courier New",monospace;overflow-x:hidden}
+#app{max-width:920px;margin:0 auto;padding:10px;min-height:100%;position:relative}
+/* niebla animada */
+.fog{position:fixed;inset:0;pointer-events:none;z-index:0;background:
+radial-gradient(ellipse 60% 30% at 20% 90%,rgba(0,255,0,.10),transparent),
+radial-gradient(ellipse 60% 30% at 80% 80%,rgba(153,50,204,.14),transparent);animation:fog 9s ease-in-out infinite alternate}
+@keyframes fog{to{transform:translateX(40px) scale(1.1);opacity:.6}}
+.screen{display:none;position:relative;z-index:1;animation:in .6s ease}
+.screen.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(14px)}}
+h1,h2{color:var(--g);text-shadow:0 0 8px var(--g),3px 3px 0 var(--r);text-align:center;letter-spacing:2px;animation:fl 3s infinite}
+@keyframes fl{0%,92%,100%{opacity:1}94%{opacity:.4}96%{opacity:1}98%{opacity:.5}}
+.card{background:linear-gradient(160deg,var(--k2),#0a000d);border:2px solid var(--g2);border-radius:14px;padding:16px;box-shadow:0 0 20px rgba(0,255,0,.25),inset 0 0 30px #000;margin:10px 0}
+button{font:inherit;font-weight:bold;font-size:1.05rem;min-height:50px;padding:10px 18px;border-radius:10px;border:2px solid var(--g);background:#041a04;color:var(--g);cursor:pointer;transition:.2s;margin:4px}
+button:hover{background:var(--g);color:#000;box-shadow:0 0 16px var(--g);transform:scale(1.03)}
+button.red{border-color:var(--r2);color:#ff6666;background:#1a0000}
+button.red:hover{background:var(--r2);color:#fff;box-shadow:0 0 16px var(--r2)}
+input{font:inherit;width:100%;min-height:48px;padding:8px 12px;border-radius:8px;border:2px solid var(--v2);background:#0d0010;color:#fff;font-size:1rem}
+input:focus{outline:none;border-color:var(--g);box-shadow:0 0 10px var(--g)}
+.row{display:flex;gap:6px;align-items:center;margin:6px 0}
+.err{color:#ff5555;font-weight:bold;min-height:1.4em;text-align:center}
+.center{text-align:center}
+li{margin:5px 0}
+/* HUD y juego */
+#hud{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;background:#0a0a0a;border:2px solid var(--v2);border-radius:10px;padding:6px 10px;font-weight:bold}
+#bar{width:110px;height:14px;border:1px solid var(--g);border-radius:8px;overflow:hidden;display:inline-block;vertical-align:middle;background:#000}
+#bar i{display:block;height:100%;width:70%;background:linear-gradient(90deg,var(--r2),var(--g));transition:width .5s}
+#hud button{min-height:38px;padding:2px 10px;margin:0}
+#cw{position:relative;margin-top:8px}
+canvas{width:100%;display:block;border:3px solid var(--g2);border-radius:12px;background:#000;box-shadow:0 0 25px rgba(0,255,0,.3);touch-action:none}
+#toast{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);border:2px solid var(--g);padding:6px 14px;border-radius:20px;opacity:0;transition:.4s;pointer-events:none;white-space:nowrap}
+#ov{position:absolute;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;padding:10px;overflow:auto;border-radius:12px;z-index:5}
+#ov .card{max-width:640px;width:100%;margin:0}
+#ov button.opt{display:block;width:100%;text-align:left}
+#tc{display:none;justify-content:space-between;margin-top:8px}
+#tc button{width:30%;min-height:64px;font-size:1.8rem;user-select:none;-webkit-user-select:none}
+@media(hover:none),(max-width:900px){#tc{display:flex}}
+.good{color:var(--g)}.bad{color:#ff5555}
+</style>
+</head>
+<body>
+<div class="fog"></div>
+<div id="app">
+
+<!-- 1. REGISTRO -->
+<section id="s-reg" class="screen on">
+  <h1>☠️ Torneo ENS Divina Providencia ☠️</h1>
+  <div class="card">
+    <h2 style="font-size:1.1rem">Nombres de los integrantes del grupo</h2>
+    <div id="members"></div>
+    <div class="center"><button id="add">+ Agregar integrante</button></div>
+    <div class="err" id="regErr"></div>
+    <div class="center"><button id="regOk">Continuar ➜</button></div>
+  </div>
+</section>
+
+<!-- 2. INICIO -->
+<section id="s-start" class="screen">
+  <h1>🧪 Torneo de la Palma:<br>La Noche del Laboratorio 🧪</h1>
+  <div class="card">
+    <b>Grupo registrado:</b>
+    <ul id="roster"></ul>
+    <b>Instrucciones:</b>
+    <ul>
+      <li>🎮 Mueve con ← → (o A/D) y salta con ↑ / Espacio (en celular usa los botones).</li>
+      <li>❓ Toca los orbes para responder preguntas de biología y cuerpo en movimiento. ¡Aprendes mientras juegas!</li>
+      <li>☠️ Evita los peligros y no caigas a los fosos: gastan tu energía ⚡.</li>
+      <li>🚪 Reúne los 3 orbes de cada salón para abrir la puerta. Recorre Laboratorio, Gimnasia y Música.</li>
+      <li>🧠 Antes de cada salón tomarán decisiones de estudiante: sus consecuencias se notan en tu energía y calificación.</li>
+      <li>🎯 Meta: obtener una buena calificación (nota de 0.0 a 5.0).</li>
+    </ul>
+    <div class="center"><button id="play">▶ Jugar</button></div>
+  </div>
+</section>
+
+<!-- JUEGO -->
+<section id="s-game" class="screen">
+  <div id="hud">
+    <span id="hRoom">🧪</span>
+    <span>⭐ <b id="hScore">0</b></span>
+    <span>⚡ <span id="bar"><i></i></span></span>
+    <span>❓ <b id="hOrb">0/3</b></span>
+    <button id="mute" title="Silenciar / activar sonido">🔊</button>
+  </div>
+  <div id="cw"><canvas id="cv" width="800" height="400"></canvas><div id="toast"></div><div id="ov"></div></div>
+  <div id="tc"><button id="bL" class="red">◀</button><button id="bJ">⬆</button><button id="bR" class="red">▶</button></div>
+</section>
+
+<!-- FINAL -->
+<section id="s-end" class="screen">
+  <h1 id="eTitle"></h1>
+  <div class="card" id="eBody"></div>
+</section>
+</div>
+
+<script>
+"use strict";
+/* ================= ESTADO EN MEMORIA (sin localStorage) ================= */
+let members=[];            // integrantes registrados
+let G={};                  // estado de la partida
+const $=id=>document.getElementById(id);
+function screen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');}
+
+/* ================= AUDIO: REGGAETON CON WEB AUDIO API ================= */
+let AC,master,muted=false,musicOn=false,step=0,nextT=0,tm;
+function initAudio(){
+  if(AC){if(AC.state==='suspended')AC.resume();return;}
+  AC=new(window.AudioContext||window.webkitAudioContext)();
+  master=AC.createGain();master.gain.value=muted?0:.5;master.connect(AC.destination);
+}
+function tone(f,t,d,type,v,f2){
+  const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+  if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+d+.02);
+}
+function noise(t,d,v,hp){
+  const n=AC.sampleRate*d,b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);
+  for(let i=0;i<n;i++)a[i]=Math.random()*2-1;
+  const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
+  s.buffer=b;f.type='highpass';f.frequency.value=hp;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  s.connect(f);f.connect(g);g.connect(master);s.start(t);
+}
+// Patrón dembow (~92 BPM): bombo en cada negra, caja en pasos 3,6,11,14, bajo menor y melodía misteriosa
+const ROOTS=[55,43.65,65.41,49],LEAD=[220,261.6,329.6,392,329.6,261.6];
+function playStep(s,t){
+  const bar=Math.floor(s/16)%4,p=s%16;
+  if(p%4===0){tone(150,t,.22,'sine',.9,40);}
+  if([3,6,11,14].includes(p)){noise(t,.12,.35,1500);tone(220,t,.08,'triangle',.25);}
+  if(p%2===0)noise(t,.03,.12,7000);
+  if([0,3,6,8,11,14].includes(p))tone(ROOTS[bar],t,.2,'sawtooth',.22);
+  if([0,6,10].includes(p))tone(LEAD[(s>>2)%6],t,.3,'square',.06);
+}
+function sched(){
+  while(nextT<AC.currentTime+.2){playStep(step,nextT);nextT+=60/92/4;step++;}
+}
+function startMusic(){initAudio();if(musicOn)return;musicOn=true;nextT=AC.currentTime+.1;tm=setInterval(sched,25);}
+function sfx(k){
+  if(!AC)return;const t=AC.currentTime;
+  if(k==='ok'){[523,659,784,1046].forEach((f,i)=>tone(f,t+i*.08,.18,'square',.18));}
+  else if(k==='bad'){tone(200,t,.4,'sawtooth',.3,60);}
+  else if(k==='click'){tone(700,t,.06,'square',.15);}
+  else if(k==='jump'){tone(300,t,.15,'sine',.2,600);}
+  else if(k==='hit'){noise(t,.2,.5,300);tone(120,t,.2,'sawtooth',.3,40);}
+  else if(k==='trans'){tone(200,t,.6,'sawtooth',.2,900);tone(100,t,.6,'sine',.2,500);}
+}
+$('mute').onclick=()=>{initAudio();muted=!muted;master.gain.value=muted?0:.5;$('mute').textContent=muted?'🔇':'🔊';};
+document.addEventListener('click',e=>{if(e.target.tagName==='BUTTON'&&AC)sfx('click');});
+
+/* ================= 1. REGISTRO ================= */
+function renderMembers(){
+  $('members').innerHTML=members.map((m,i)=>`<div class="row"><input data-i="${i}" placeholder="Nombre completo del integrante ${i+1}" value="${m.replace(/"/g,'&quot;')}"><button class="red" data-d="${i}" title="Quitar">✖</button></div>`).join('');
+  $('members').querySelectorAll('input').forEach(inp=>inp.oninput=()=>members[inp.dataset.i]=inp.value);
+  $('members').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{members.splice(b.dataset.d,1);if(!members.length)members.push('');renderMembers();});
+}
+members=[''];renderMembers();
+$('add').onclick=()=>{members.push('');renderMembers();};
+$('regOk').onclick=()=>{
+  initAudio();
+  const names=members.map(m=>m.trim());
+  if(!names.some(n=>n)){$('regErr').textContent='⚠️ Escribe el nombre completo de al menos un integrante.';return;}
+  if(names.some(n=>!n)){$('regErr').textContent='⚠️ Hay campos vacíos: complétalos o quita ese integrante.';return;}
+  members=names;$('regErr').textContent='';
+  $('roster').innerHTML=members.map(m=>`<li>🧑‍🎓 ${m.replace(/</g,'&lt;')}</li>`).join('');
+  startMusic();screen('s-start');
+};
+
+/* ================= CONTENIDO EDUCATIVO ================= */
+// Decisiones del caso práctico (e = energía, s = puntos)
+const DEC=[
+ {t:'🌙 Noche antes del laboratorio',q:'Mañana hay práctica de laboratorio y examen. ¿Qué hace tu grupo esta noche?',o:[
+  {t:'Repasar un rato y dormir 8 horas',e:25,s:100,fb:'¡Correcto! Dormir consolida la memoria y recarga energía. Tu cuerpo rinde más.'},
+  {t:'Trasnochar jugando videojuegos',e:-30,s:0,fb:'El sueño insuficiente baja la atención y la reacción. Entras agotado.'},
+  {t:'Tomar bebidas energéticas toda la noche',e:-15,s:25,fb:'La cafeína da un pico falso y luego cansancio. No reemplaza el descanso.'}]},
+ {t:'🍽️ Desayuno antes de Gimnasia',q:'Se acerca la clase de educación física. ¿Qué desayunas?',o:[
+  {t:'Avena, fruta y agua',e:20,s:100,fb:'¡Excelente! Los carbohidratos complejos y la hidratación dan energía sostenida a tus músculos.'},
+  {t:'Nada, así corro más ligero',e:-25,s:0,fb:'Sin combustible (glucosa) el músculo se fatiga rápido y puede haber mareo.'},
+  {t:'Papas fritas y gaseosa',e:-10,s:30,fb:'El azúcar sube y baja rápido; sentirás pesadez durante el ejercicio.'}]},
+ {t:'🎵 Trabajo en equipo en Música',q:'Un compañero no entiende el ritmo de la presentación grupal. ¿Qué haces?',o:[
+  {t:'Ensayar con él y apoyarlo',e:15,s:100,fb:'¡Bien! Cooperar libera endorfinas y mejora la nota de todo el equipo.'},
+  {t:'Ignorarlo y que se las arregle',e:-10,s:20,fb:'La presentación sale desafinada: el resultado depende de todos.'},
+  {t:'Reírte de él',e:-20,s:0,fb:'El estrés social eleva el cortisol y daña el ambiente del grupo.'}]},
+ {t:'📝 Examen final del torneo',q:'Los nervios aparecen: el corazón late fuerte (¡adrenalina!). ¿Cómo la manejas?',o:[
+  {t:'Respirar profundo y leer con calma',e:20,s:100,fb:'¡Perfecto! La respiración lenta activa el sistema parasimpático y baja el pulso.'},
+  {t:'Entrar en pánico y responder rápido',e:-20,s:10,fb:'El exceso de adrenalina nubla el razonamiento y cometes errores.'},
+  {t:'Intentar copiar',e:-15,s:0,fb:'Copiar no enseña nada y pierdes la nota por falta de integridad.'}]}
+];
+// Preguntas de biología integradas en los orbes (a = índice correcto)
+const QS=[
+ [{q:'¿Qué hormona libera la glándula suprarrenal ante un susto?',o:['Adrenalina','Insulina','Melatonina'],a:0,fb:'La adrenalina prepara el cuerpo para luchar o huir.'},
+  {q:'Con mucha adrenalina, la frecuencia cardíaca…',o:['Disminuye','Aumenta','Se detiene'],a:1,fb:'El corazón late más rápido para enviar más sangre y oxígeno a los músculos.'},
+  {q:'¿Qué orgánulo produce la energía (ATP) de la célula?',o:['Ribosoma','Núcleo','Mitocondria'],a:2,fb:'La mitocondria es la "central de energía" celular.'}],
+ [{q:'Antes de hacer ejercicio lo mejor es…',o:['Comer en exceso','Calentar y estirar','Quedarse quieto'],a:1,fb:'Calentar eleva la temperatura muscular y previene lesiones.'},
+  {q:'¿Qué músculo se contrae al flexionar el codo?',o:['Bíceps','Glúteo','Cuádriceps'],a:0,fb:'El bíceps braquial flexiona el antebrazo.'},
+  {q:'Sudar durante el ejercicio sirve para…',o:['Perder huesos','Regular la temperatura','Crecer más'],a:1,fb:'La evaporación del sudor enfría el cuerpo (homeostasis).'}],
+ [{q:'¿Qué parte del oído vibra con el sonido?',o:['Retina','Córnea','Tímpano'],a:2,fb:'El tímpano transmite la vibración a los huesecillos del oído.'},
+  {q:'El volumen muy alto por mucho tiempo daña…',o:['Células ciliadas de la cóclea','El fémur','Los pulmones'],a:0,fb:'Esas células captan el sonido y no se regeneran.'},
+  {q:'Para cantar y bailar respiramos con ayuda del…',o:['Fémur','Diafragma','Hígado'],a:1,fb:'El diafragma es el músculo principal de la respiración.'}]
+];
+// Niveles: g=suelo, p=plataformas, h=peligros, o=orbes
+const LV=[
+ {n:'Laboratorio 🧪',bg:['#031a03','#000'],deco:['🧪','⚗️','🔬','🧫'],W:1800,
+  g:[[0,600],[700,1200],[1300,1800]],p:[[250,280,110],[450,250,110],[780,290,110],[980,250,110],[1400,290,110],[1600,250,110]],h:[[400],[900]],o:[[305,245],[505,215],[1030,215]]},
+ {n:'Gimnasia 🏋️',bg:['#1a0000','#000'],deco:['🏀','🏋️','🤸','⚽'],W:1800,
+  g:[[0,500],[620,1000],[1120,1500],[1600,1800]],p:[[200,280,100],[380,240,100],[700,290,100],[870,250,100],[1200,290,100],[1350,250,100],[1650,280,100]],h:[[300],[800],[1250]],o:[[250,245],[430,205],[1400,215]]},
+ {n:'Música 🎵',bg:['#14001a','#000'],deco:['🎸','🎹','🥁','🎤'],W:1800,
+  g:[[0,450],[580,900],[1050,1400],[1520,1800]],p:[[180,285,100],[330,245,100],[650,285,100],[780,245,100],[1100,285,100],[1250,245,100],[1560,285,100]],h:[[250],[700],[1200]],o:[[230,250],[830,210],[1300,210]]}
+];
+
+/* ================= FLUJO ================= */
+$('play').onclick=()=>{
+  G={room:0,score:0,energy:70,orbs:0,paused:true,log:[],right:0,run:false};
+  screen('s-game');sfx('trans');decision(0);
+};
+function toast(m){const t=$('toast');t.textContent=m;t.style.opacity=1;clearTimeout(t.h);t.h=setTimeout(()=>t.style.opacity=0,2200);}
+function hud(){
+  $('hScore').textContent=G.score;$('bar').firstElementChild.style.width=G.energy+'%';
+  $('hOrb').textContent=G.orbs+'/3';$('hRoom').textContent=LV[Math.min(G.room,2)].n;
+}
+function ov(h){$('ov').innerHTML=h;$('ov').style.display='flex';}
+function ovHide(){$('ov').style.display='none';}
+function addE(d){G.energy=Math.max(0,Math.min(100,G.energy+d));}
+
+// DECISIÓN (caso práctico) -> consecuencias visibles en energía y puntaje
+function decision(i){
+  G.paused=true;const d=DEC[i];hud();
+  ov(`<div class="card"><h2 style="font-size:1.1rem">${d.t}</h2><p>${d.q}</p>${d.o.map((o,k)=>`<button class="opt" data-k="${k}">${'ABC'[k]}) ${o.t}</button>`).join('')}</div>`);
+  $('ov').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const o=d.o[b.dataset.k],good=o.s>=100;
+    addE(o.e);G.score+=o.s;G.log.push({t:d.t,c:o.t,good});if(good)G.right++;sfx(good?'ok':'bad');hud();
+    ov(`<div class="card"><h2 class="${good?'good':'bad'}" style="font-size:1.1rem">${good?'✅ ¡Buena decisión!':'⚠️ Consecuencia'}</h2><p>${o.fb}</p>
+      <p><b>⚡ Energía ${o.e>=0?'+':''}${o.e}</b> · <b>⭐ Puntos +${o.s}</b></p>
+      <p>${o.e<0?'Tu estudiante se mueve más lento y salta menos.':'Tu estudiante se siente con más ánimo y velocidad.'}</p>
+      <div class="center"><button id="go">${i<3?'Entrar al salón ➜':'Ver resultado ➜'}</button></div></div>`);
+    $('go').onclick=()=>{ovHide();sfx('trans');if(i<3)startLevel(i<3?i:2);else end();};
+  });
+}
+function startLevel(r){
+  G.room=r;G.orbs=0;const L=LV[r];
+  G.p={x:40,y:300,vx:0,vy:0,on:false,inv:0,face:1};G.last=40;
+  G.got=L.o.map(()=>false);G.cam=0;G.paused=false;hud();
+  toast('Salón: '+L.n);
+  if(!G.run){G.run=true;requestAnimationFrame(loop);}
+}
+function question(i){
+  G.paused=true;const q=QS[G.room][i];
+  ov(`<div class="card"><h2 style="font-size:1.1rem">❓ Pregunta de biología</h2><p>${q.q}</p>${q.o.map((o,k)=>`<button class="opt" data-k="${k}">${'ABC'[k]}) ${o}</button>`).join('')}</div>`);
+  $('ov').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const ok=+b.dataset.k===q.a;
+    if(ok){G.score+=100;G.right++;addE(10);}else{addE(-12);}
+    G.got[i]=true;G.orbs++;sfx(ok?'ok':'bad');hud();
+    ov(`<div class="card"><h2 class="${ok?'good':'bad'}" style="font-size:1.1rem">${ok?'✅ ¡Correcto! +100':'❌ Casi… -12 ⚡'}</h2><p>${ok?'':'Respuesta: <b>'+q.o[q.a]+'</b>.<br>'}${q.fb}</p><div class="center"><button id="go">Seguir ➜</button></div></div>`);
+    $('go').onclick=()=>{ovHide();G.paused=false;if(G.orbs===3)toast('🚪 ¡La puerta se abrió!');};
+  });
+}
+function nextRoom(){
+  G.paused=true;sfx('trans');
+  if(G.room<2)decision(G.room+1);else decision(3);
+}
+
+/* ================= MOTOR DE PLATAFORMAS ================= */
+const K={l:0,r:0,j:0};
+addEventListener('keydown',e=>{const c=e.code;if(['ArrowLeft','KeyA'].includes(c))K.l=1;if(['ArrowRight','KeyD'].includes(c))K.r=1;if(['ArrowUp','KeyW','Space'].includes(c)){K.j=1;e.preventDefault();}});
+addEventListener('keyup',e=>{const c=e.code;if(['ArrowLeft','KeyA'].includes(c))K.l=0;if(['ArrowRight','KeyD'].includes(c))K.r=0;if(['ArrowUp','KeyW','Space'].includes(c))K.j=0;});
+[['bL','l'],['bR','r'],['bJ','j']].forEach(([id,k])=>{const b=$(id);
+  b.addEventListener('pointerdown',e=>{e.preventDefault();initAudio();K[k]=1;});
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>K[k]=0));});
+
+const cv=$('cv'),cx=cv.getContext('2d');
+function solids(L){
+  return L.g.map(g=>({x:g[0],y:360,w:g[1]-g[0],h:40})).concat(L.p.map(p=>({x:p[0],y:p[1],w:p[2],h:14})));
+}
+function update(){
+  const L=LV[G.room],P=G.p,sp=2.4+G.energy/100*2.2,jmp=-(10.5+G.energy/100*2.5);
+  P.vx=(K.r-K.l)*sp;if(P.vx)P.face=Math.sign(P.vx);
+  if(K.j&&P.on){P.vy=jmp;P.on=false;sfx('jump');}
+  P.vy+=.6;const py=P.y;P.x=Math.max(0,Math.min(L.W-24,P.x+P.vx));P.y+=P.vy;P.on=false;
+  for(const s of solids(L)){
+    if(P.vy>=0&&py+32<=s.y+2&&P.y+32>=s.y&&P.x+24>s.x&&P.x<s.x+s.w){P.y=s.y-32;P.vy=0;P.on=true;if(s.y===360)G.last=Math.max(s.x+20,Math.min(P.x,s.x+s.w-40));}
+  }
+  if(P.y>440){P.x=G.last;P.y=300;P.vy=0;addE(-10);G.score=Math.max(0,G.score-30);sfx('hit');toast('💀 Caíste al foso: -30 ⭐ -10 ⚡');hud();}
+  if(P.inv>0)P.inv--;
+  for(const h of L.h){if(!P.inv&&P.x+24>h[0]&&P.x<h[0]+30&&P.y+32>345){P.inv=70;P.vy=-7;addE(-15);G.score=Math.max(0,G.score-20);sfx('hit');toast('☠️ ¡Peligro! -20 ⭐ -15 ⚡');hud();}}
+  L.o.forEach((o,i)=>{if(!G.got[i]&&Math.abs(P.x+12-o[0])<26&&Math.abs(P.y+16-o[1])<30){question(i);}});
+  const dx=L.W-70;
+  if(P.x+24>dx&&P.x<dx+40){if(G.orbs===3)nextRoom();else if(!G.tw||Date.now()-G.tw>2000){G.tw=Date.now();toast('🔒 Responde los 3 orbes ❓ primero');}}
+  G.cam=Math.max(0,Math.min(L.W-800,P.x-300));
+}
+function draw(t){
+  const L=LV[G.room],c=G.cam,P=G.p;
+  const gr=cx.createLinearGradient(0,0,0,400);gr.addColorStop(0,L.bg[0]);gr.addColorStop(1,L.bg[1]);cx.fillStyle=gr;cx.fillRect(0,0,800,400);
+  cx.globalAlpha=.18;cx.font='40px serif';
+  for(let i=0;i<12;i++){cx.fillText(L.deco[i%4],i*170-c*.4,90+(i%3)*60);}
+  cx.globalAlpha=1;
+  // plataformas con borde fosforescente
+  for(const s of solids(L)){const x=s.x-c;cx.fillStyle='#0d0d0d';cx.fillRect(x,s.y,s.w,s.h);cx.fillStyle='#00cc00';cx.shadowColor='#0f0';cx.shadowBlur=8;cx.fillRect(x,s.y,s.w,3);cx.shadowBlur=0;}
+  cx.font='24px serif';
+  for(const h of L.h){cx.fillText('☠️',h[0]-c,358);}
+  L.o.forEach((o,i)=>{if(!G.got[i]){cx.shadowColor='#9932cc';cx.shadowBlur=14+Math.sin(t/200)*6;cx.font='28px serif';cx.fillText('❓',o[0]-14-c,o[1]+10+Math.sin(t/300+i)*4);cx.shadowBlur=0;}});
+  cx.font='40px serif';cx.fillText(G.orbs===3?'🚪':'🔒',L.W-70-c,360);
+  if(!(P.inv&&Math.floor(t/80)%2)){cx.font='30px serif';cx.save();cx.translate(P.x+12-c,P.y+28);cx.scale(P.face,1);cx.fillText('🏃',-15,0);cx.restore();}
+  // niebla + viñeta
+  for(let i=0;i<5;i++){const fx=((t/40+i*220)%1000)-100,g2=cx.createRadialGradient(fx,330,0,fx,330,150);g2.addColorStop(0,'rgba(0,255,0,.10)');g2.addColorStop(1,'rgba(0,255,0,0)');cx.fillStyle=g2;cx.fillRect(fx-150,180,300,220);}
+  const v=cx.createRadialGradient(400,200,150,400,200,480);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.8)');cx.fillStyle=v;cx.fillRect(0,0,800,400);
+  if(G.energy<25){cx.fillStyle='rgba(204,0,0,'+(.1+.08*Math.sin(t/150))+')';cx.fillRect(0,0,800,400);}
+}
+function loop(t){
+  if(!G.paused&&$('s-game').classList.contains('on')){update();}
+  if(G.p)draw(t);
+  if(G.run)requestAnimationFrame(loop);
+}
+
+/* ================= PANTALLA FINAL ================= */
+function end(){
+  G.run=false;G.paused=true;ovHide();
+  const max=1300,nota=Math.max(1,Math.min(5,G.score/max*5)).toFixed(1),ok=nota>=3;
+  $('eTitle').textContent=ok?'🏆 ¡Aprobaron el Torneo! 🏆':'💀 Necesitan repasar 💀';
+  $('eBody').innerHTML=`<h2 style="font-size:1.4rem">Calificación: ${nota} / 5.0</h2>
+   <p class="center">⭐ Puntos: <b>${G.score}</b> · ✅ Aciertos y buenas decisiones: <b>${G.right}</b> de 13 · ⚡ Energía final: <b>${G.energy}%</b></p>
+   <b>Decisiones del caso práctico:</b><ul>${G.log.map(l=>`<li>${l.good?'✅':'⚠️'} ${l.t}: ${l.c}</li>`).join('')}</ul>
+   <p>${ok?'Dormir bien, alimentarse, calentar, cooperar y respirar con calma te dieron una buena calificación.':'Recuerda: descanso, buena alimentación y calma ayudan al cuerpo y a la nota. ¡Inténtalo de nuevo!'}</p>
+   <p class="center good"><b>🎉 ¡Felicitaciones a:</b><br>${members.map(m=>'🧑‍🎓 '+m.replace(/</g,'&lt;')).join('<br>')}<br><b>por su participación en el Torneo ENS Divina Providencia!</b></p>
+   <div class="center"><button id="again">🔁 Jugar de nuevo</button></div>`;
+  screen('s-end');sfx(ok?'ok':'bad');
+  $('again').onclick=()=>{screen('s-start');};
+}
+</script>
+</body>
+</html>

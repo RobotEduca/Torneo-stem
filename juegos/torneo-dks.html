@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Torneo ENS Divina Providencia</title>
+<style>
+/* ===== ESTILOS GENERALES ===== */
+:root{--azul:#4169E1;--rosa:#FF1493;--oro:#FFD700;--cian:#00CED1;--oscuro:#141a3c}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100%;overflow-x:hidden}
+body{font-family:'Segoe UI',Arial,sans-serif;font-size:18px;color:#fff;background:linear-gradient(160deg,#141a3c,#2a1450 60%,#4a0f3c);min-height:100vh}
+header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:linear-gradient(90deg,var(--azul),var(--rosa));box-shadow:0 3px 10px #0008}
+header h1{font-size:clamp(16px,3.4vw,26px);line-height:1.15}
+header small{display:block;font-size:13px;color:var(--oro)}
+#mute{min-width:46px;min-height:46px;border:none;border-radius:50%;font-size:22px;background:#0005;color:#fff;cursor:pointer}
+.screen{display:none;max-width:900px;margin:0 auto;padding:16px}
+.screen.on{display:block}
+.card{background:#ffffff14;border:2px solid #ffffff30;border-radius:18px;padding:18px;margin-bottom:14px;backdrop-filter:blur(3px)}
+h2{color:var(--oro);margin-bottom:10px;font-size:clamp(20px,4vw,30px)}
+p,li{line-height:1.45}
+ul{padding-left:22px}
+.btn{min-height:48px;min-width:48px;padding:10px 20px;border:none;border-radius:14px;font-size:18px;font-weight:700;cursor:pointer;color:#fff;background:var(--azul);box-shadow:0 4px 0 #1b2f80}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1b2f80}
+.btn.rosa{background:var(--rosa);box-shadow:0 4px 0 #9a0b58}
+.btn.oro{background:var(--oro);color:#222;box-shadow:0 4px 0 #a88c00}
+.btn.grande{font-size:24px;padding:14px 32px;width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.fila{display:flex;gap:8px;margin-bottom:8px}
+.fila input{flex:1;min-width:0;min-height:48px;padding:8px 12px;font-size:18px;border-radius:12px;border:2px solid var(--cian);background:#fff;color:#111}
+.fila .btn{padding:8px 14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--cian);color:#012;padding:6px 14px;border-radius:20px;font-weight:700}
+.lore{font-size:15px;color:#cfe;font-style:italic;margin-top:8px}
+/* ===== PANTALLA DE JUEGO ===== */
+#hud{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;font-weight:700;margin-bottom:8px}
+#hud span{background:#0006;padding:6px 12px;border-radius:12px}
+#wrap{position:relative}
+canvas{display:block;width:100%;height:auto;border-radius:16px;border:3px solid var(--oro);background:#000;touch-action:manipulation}
+#qbox{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:8px;background:#0b0f2ccc;border-radius:16px;overflow:auto}
+#qbox.on{display:flex}
+#qin{width:100%;max-width:680px;max-height:100%;overflow:auto;background:#1c2257;border:3px solid var(--cian);border-radius:16px;padding:14px}
+#qin h3{color:var(--oro);font-size:19px;margin-bottom:10px;line-height:1.3}
+.op{display:block;width:100%;text-align:left;margin-bottom:8px;min-height:46px;padding:10px 12px;font-size:17px;border-radius:12px;border:2px solid var(--cian);background:#2a3380;color:#fff;cursor:pointer}
+.op.ok{background:#1a9a4a;border-color:#7dffa8}
+.op.mal{background:#b3203a;border-color:#ff9aa8}
+#fb{margin:8px 0;font-size:16px;line-height:1.4}
+#saltar{margin-top:10px;width:100%;font-size:22px}
+.nivel{font-size:clamp(26px,6vw,40px);color:var(--oro);font-weight:800}
+.big{font-size:clamp(30px,7vw,52px);font-weight:800;color:var(--cian)}
+@media(max-width:600px){body{font-size:16px}.card{padding:12px}.op{font-size:16px}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>🐻 Torneo ENS Divina Providencia</h1><small>🌴 Ecosistema Torneo la palma · Hortigal</small></div>
+  <button id="mute" aria-label="Silenciar">🔊</button>
+</header>
+
+<!-- PANTALLA 1: REGISTRO -->
+<section class="screen on" id="s1">
+  <div class="card">
+    <h2>Torneo ENS Divina Providencia</h2>
+    <p><b>Registro del grupo participante</b></p><br>
+    <div id="lista"></div>
+    <button class="btn oro" id="add">+ Agregar integrante</button>
+    <br><br>
+    <button class="btn rosa grande" id="cont" disabled>Continuar</button>
+  </div>
+</section>
+
+<!-- PANTALLA 2: BIENVENIDA -->
+<section class="screen" id="s2">
+  <div class="card">
+    <h2>🐻 Oso Atleta: ¡Salta, responde y gana!</h2>
+    <p>Ayuden al oso a cruzar la ciudad 🏙️ y el desierto 🏜️ del torneo, superando los balones que ruedan por el camino.</p>
+    <ul>
+      <li><b>Saltar:</b> barra espaciadora, flecha ↑, clic o toque en la pantalla (o botón SALTAR).</li>
+      <li><b>Balones</b> (⚽🏀🏐⚾): esquívenlos. Cada choque resta 5 puntos.</li>
+      <li><b>Gemas</b> 💎: recójanlas, cada una suma 10 puntos.</li>
+      <li><b>Retos de deporte:</b> cada cierto tiempo llega una pregunta. Respondan en equipo (también con teclas 1-4). Acierto = +50 puntos y cambio de mundo; error = pierden una vida ❤️.</li>
+      <li>Son 8 retos y 3 vidas. ¡Argumenten juntos antes de elegir!</li>
+    </ul>
+    <p class="lore">Este desafío forma parte del Torneo la palma, donde los mejores equipos del Torneo ENS Divina Providencia demuestran su talento.</p>
+  </div>
+  <div class="card"><b>Equipo participante:</b><br><br><div class="chips" id="equipo"></div></div>
+  <button class="btn rosa grande" id="jugar">🎮 ¡Jugar!</button>
+</section>
+
+<!-- PANTALLA 3: JUEGO -->
+<section class="screen" id="s3">
+  <div id="hud"><span id="hPun">⭐ 0</span><span id="hVid">❤️❤️❤️</span><span id="hRet">Reto 1/8</span><span id="hMun">🏙️ Ciudad</span></div>
+  <div id="wrap">
+    <canvas id="cv" width="800" height="400"></canvas>
+    <div id="qbox"><div id="qin"></div></div>
+  </div>
+  <button class="btn grande" id="saltar">⬆ SALTAR</button>
+</section>
+
+<!-- PANTALLA 4: RESULTADO -->
+<section class="screen" id="s4">
+  <div class="card">
+    <h2>Resultado del Torneo</h2>
+    <p><b>Equipo:</b></p><div class="chips" id="rEq" style="margin:8px 0 14px"></div>
+    <p>Puntaje final</p><div class="big" id="rPun">0</div>
+    <p id="rAc"></p><br>
+    <p>Nivel de desempeño</p><div class="nivel" id="rNiv"></div>
+  </div>
+  <div class="card">
+    <h2>Conceptos clave aprendidos</h2>
+    <p>Responder y superar obstáculos de la materia asignada (Deportes):</p>
+    <ul>
+      <li>Los retos se superan con conocimiento: reglamento, medidas y duración de cada deporte.</li>
+      <li>Fútbol: 11 jugadores por equipo, 90 minutos, el fuera de lugar y el VAR.</li>
+      <li>Baloncesto: canasta de 3 puntos, 5 jugadores y aro a 3,05 m.</li>
+      <li>Voleibol: 6 jugadores, 3 toques por equipo y sets a 25 puntos.</li>
+      <li>Béisbol: 9 entradas, 3 outs y 4 bases (home run).</li>
+      <li>Hábitos: calentar, hidratarse y el juego limpio (fair play) ayudan a rendir más.</li>
+      <li>Trabajar en equipo y decidir con argumentos mejora los resultados.</li>
+    </ul>
+  </div>
+  <button class="btn rosa grande" id="otra">🔄 Jugar de nuevo</button>
+</section>
+
+<script>
+/* ================= ESTADO EN MEMORIA (sin localStorage) ================= */
+let integrantes = [""];                 // nombres del grupo
+let G = {};                             // estado de la partida
+const $ = id => document.getElementById(id);
+function mostrar(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo(0,0);}
+
+/* ================= AUDIO (Web Audio API, reguetón procedural) ================= */
+let AC=null, master=null, musicaOn=false, silencio=false, paso=0, tNext=0, timer=null;
+function initAudio(){
+  if(AC) {if(AC.state==='suspended')AC.resume();return;}
+  AC=new (window.AudioContext||window.webkitAudioContext)();
+  master=AC.createGain();master.gain.value=silencio?0:0.7;master.connect(AC.destination);
+}
+// Tono con envolvente ADSR simple
+function tono(f,tipo,t,dur,vol,f2){
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.type=tipo;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+0.01);
+  g.gain.exponentialRampToValueAtTime(vol*0.5,t+dur*0.4);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+0.05);
+}
+function ruido(t,dur,vol,hp){
+  const n=AC.sampleRate*dur,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+  const s=AC.createBufferSource(),g=AC.createGain(),f=AC.createBiquadFilter();
+  s.buffer=b;f.type='highpass';f.frequency.value=hp;
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  s.connect(f);f.connect(g);g.connect(master);s.start(t);
+}
+// Patrón dembow simplificado: 16 pasos por compás, 96 bpm
+const BASS=[55,0,0,55,0,0,65.4,0,49,0,0,49,0,0,55,0];
+const LEAD=[440,0,523,0,659,0,523,0,440,0,392,0,440,0,0,0];
+function paso16(p,t){
+  const s=p%16,compas=Math.floor(p/16);
+  if(s%4===0){tono(150,'sine',t,0.2,0.9,45);}                // bombo
+  if(s===3||s===6||s===11||s===14){ruido(t,0.12,0.35,1500);tono(220,'triangle',t,0.08,0.2);} // caja dembow
+  if(s%2===0)ruido(t,0.03,0.12,7000);                          // hi-hat
+  if(BASS[s])tono(BASS[s],'sawtooth',t,0.25,0.35);             // bajo
+  if(s===0||s===6||s===10){tono(220,'square',t,0.15,0.07);tono(262,'square',t,0.15,0.07);tono(330,'square',t,0.15,0.07);} // acorde
+  if(compas<4&&LEAD[s])tono(LEAD[s],'triangle',t,0.2,0.18);    // intro melódica
+}
+function planificar(){
+  while(tNext<AC.currentTime+0.15){paso16(paso,tNext);tNext+=60/96/4;paso++;}
+}
+function iniciarMusica(){
+  if(musicaOn||!AC)return;musicaOn=true;paso=0;tNext=AC.currentTime+0.05;
+  timer=setInterval(planificar,40);
+}
+function sfx(tipo){
+  if(!AC)return;const t=AC.currentTime;
+  if(tipo==='click')tono(700,'square',t,0.07,0.15);
+  if(tipo==='gema'){tono(1200,'sine',t,0.08,0.25);tono(1800,'sine',t+0.07,0.1,0.25);}
+  if(tipo==='ok'){[523,659,784,1047].forEach((f,i)=>tono(f,'triangle',t+i*0.09,0.18,0.3));}
+  if(tipo==='mal'){tono(300,'sawtooth',t,0.35,0.3,90);}
+  if(tipo==='golpe'){tono(120,'square',t,0.15,0.3,50);}
+  if(tipo==='salto')tono(300,'sine',t,0.15,0.2,700);
+  if(tipo==='fin'){[392,523,659,784,1047].forEach((f,i)=>tono(f,'square',t+i*0.12,0.3,0.2));}
+}
+$('mute').onclick=()=>{initAudio();silencio=!silencio;master.gain.value=silencio?0:0.7;$('mute').textContent=silencio?'🔇':'🔊';};
+// Música inicia tras la primera interacción
+document.addEventListener('pointerdown',()=>{initAudio();iniciarMusica();},{once:true});
+document.addEventListener('keydown',()=>{initAudio();iniciarMusica();},{once:true});
+document.addEventListener('click',e=>{if(e.target.closest('.btn'))sfx('click');});
+
+/* ================= PANTALLA 1: REGISTRO ================= */
+function pintarLista(){
+  const cont=$('lista');cont.innerHTML='';
+  integrantes.forEach((n,i)=>{
+    const f=document.createElement('div');f.className='fila';
+    const inp=document.createElement('input');inp.type='text';inp.maxLength=60;inp.value=n;
+    inp.placeholder='Nombre del integrante '+(i+1);
+    inp.oninput=()=>{integrantes[i]=inp.value;validar();};
+    f.appendChild(inp);
+    if(integrantes.length>1){
+      const x=document.createElement('button');x.className='btn rosa';x.textContent='✕';x.setAttribute('aria-label','Quitar');
+      x.onclick=()=>{integrantes.splice(i,1);pintarLista();validar();};f.appendChild(x);
+    }
+    cont.appendChild(f);
+  });
+}
+function validar(){$('cont').disabled=!integrantes.some(n=>n.trim().length>0);}
+$('add').onclick=()=>{integrantes.push("");pintarLista();const ins=$('lista').querySelectorAll('input');ins[ins.length-1].focus();validar();};
+$('cont').onclick=()=>{
+  integrantes=integrantes.map(n=>n.trim()).filter(n=>n);
+  $('equipo').innerHTML='';
+  integrantes.forEach(n=>{const c=document.createElement('span');c.className='chip';c.textContent='👤 '+n;$('equipo').appendChild(c);});
+  mostrar('s2');
+};
+
+/* ================= PREGUNTAS DE DEPORTES (Décimo) ================= */
+const PREG=[
+ {q:"⚽ En fútbol, ¿cuántos jugadores de cada equipo están en la cancha al inicio (incluido el arquero)?",o:["9","10","11","12"],c:2,e:"Cada equipo juega con 11 jugadores: 10 de campo y 1 arquero."},
+ {q:"🏀 ¿A qué altura está el aro de baloncesto sobre el piso?",o:["2,50 m","3,05 m","3,50 m","2,85 m"],c:1,e:"El aro oficial está a 3,05 m (10 pies) en todas las categorías de adultos."},
+ {q:"🏐 En voleibol, ¿cuántos toques como máximo puede dar un equipo antes de pasar el balón?",o:["2","3","4","5"],c:1,e:"Se permiten hasta 3 toques por equipo (sin contar el bloqueo)."},
+ {q:"⚾ En béisbol, ¿cuántos outs hay en cada mitad de entrada?",o:["2","3","4","5"],c:1,e:"Con 3 outs termina la mitad de la entrada y cambian los equipos."},
+ {q:"⚽ Un jugador queda en 'fuera de lugar' cuando, al recibir el pase, está...",o:["Más cerca de la línea de gol rival que el balón y el penúltimo rival","En su propio campo","Detrás del balón","Junto al árbitro"],c:0,e:"Está en posición adelantada si está más cerca de la meta rival que el balón y que el penúltimo adversario."},
+ {q:"🏀 ¿Cuántos puntos vale un tiro de campo convertido desde detrás de la línea de tres puntos?",o:["1","2","3","4"],c:2,e:"Los tiros desde detrás del arco valen 3 puntos; los de dentro, 2; y el tiro libre, 1."},
+ {q:"💧 Antes y durante el ejercicio intenso, ¿qué hábito mejora el rendimiento y previene lesiones?",o:["No tomar agua","Calentar e hidratarse","Entrenar sin descanso","Saltarse el desayuno"],c:1,e:"Calentar prepara músculos y articulaciones, y la hidratación evita calambres y fatiga."},
+ {q:"🤝 Un rival cae lesionado y tu equipo tiene el balón. ¿Qué acción refleja el juego limpio (fair play)?",o:["Seguir atacando sin mirar","Sacar el balón fuera para que lo atiendan","Burlarse del rival","Reclamar al árbitro"],c:1,e:"El fair play es respetar al rival y priorizar la salud sobre el marcador."}
+];
+const TOTAL=PREG.length;
+
+/* ================= JUEGO (Canvas 2D, plataforma) ================= */
+const cv=$('cv'),cx=cv.getContext('2d'),W=800,H=400,SUELO=330;
+let raf=null,ultimo=0,intro=0;
+
+function nuevaPartida(){
+  G={score:0,vidas:3,idx:0,aciertos:0,mundo:'ciudad',scroll:0,t:0,tq:0,spawn:1,gspawn:0.6,
+     obs:[],gemas:[],oso:{x:110,y:SUELO,vy:0,suelo:true,inv:0},esperando:false,fin:false,banner:0,bannerTxt:''};
+  actualizarHUD();
+}
+function actualizarHUD(){
+  $('hPun').textContent='⭐ '+G.score;
+  $('hVid').textContent='❤️'.repeat(Math.max(G.vidas,0))+'🖤'.repeat(3-Math.max(G.vidas,0));
+  $('hRet').textContent='Reto '+Math.min(G.idx+1,TOTAL)+'/'+TOTAL;
+  $('hMun').textContent=G.mundo==='ciudad'?'🏙️ Ciudad':'🏜️ Desierto';
+}
+function saltar(){
+  if(!G.oso||G.esperando||G.fin||!$('s3').classList.contains('on'))return;
+  if(G.oso.suelo){G.oso.vy=-640;G.oso.suelo=false;sfx('salto');}
+}
+document.addEventListener('keydown',e=>{
+  if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();saltar();}
+  if(G.esperando&&G.opciones&&'1234'.includes(e.key)&&+e.key<=G.opciones.length)responder(+e.key-1);
+});
+cv.addEventListener('pointerdown',saltar);
+$('saltar').addEventListener('pointerdown',e=>{e.preventDefault();saltar();});
+
+function actualizar(dt){
+  if(G.esperando||G.fin)return;
+  const o=G.oso,v=230+G.idx*8;
+  G.t+=dt;G.tq+=dt;G.scroll+=v*dt;if(G.banner>0)G.banner-=dt;
+  // física del oso
+  o.vy+=1750*dt;o.y+=o.vy*dt;
+  if(o.y>=SUELO){o.y=SUELO;o.vy=0;o.suelo=true;}
+  if(o.inv>0)o.inv-=dt;
+  // generar balones y gemas
+  G.spawn-=dt;
+  if(G.spawn<=0){
+    const alto=Math.random()<0.3;
+    G.obs.push({x:W+30,r:18,y:alto?SUELO-88:SUELO-18,t:Math.floor(Math.random()*4),rot:0,alto});
+    G.spawn=1.2+Math.random()*1.1;
+  }
+  G.gspawn-=dt;
+  if(G.gspawn<=0){G.gemas.push({x:W+30,y:SUELO-30-Math.random()*95});G.gspawn=0.8+Math.random()*0.9;}
+  // mover y colisionar
+  G.obs.forEach(b=>{b.x-=(v+60)*dt;b.rot+=dt*6;
+    if(o.inv<=0&&Math.abs(b.x-o.x)<b.r+18&&b.y+b.r>o.y-52&&b.y-b.r<o.y){
+      G.score=Math.max(0,G.score-5);o.inv=1.2;b.x=-100;sfx('golpe');actualizarHUD();}});
+  G.gemas.forEach(g=>{g.x-=v*dt;
+    if(Math.abs(g.x-o.x)<28&&g.y>o.y-70&&g.y<o.y+6){g.x=-100;G.score+=10;sfx('gema');actualizarHUD();}});
+  G.obs=G.obs.filter(b=>b.x>-60);G.gemas=G.gemas.filter(g=>g.x>-40);
+  // cada ~10 s llega un reto de deporte
+  if(G.tq>10)lanzarPregunta();
+}
+
+/* ---------- Dibujo ---------- */
+function hash(i){return(Math.sin(i*127.1)*43758.5453)%1;}
+function dibujarFondo(){
+  const c=G.mundo==='ciudad';
+  const g=cx.createLinearGradient(0,0,0,H);
+  if(c){g.addColorStop(0,'#2a2f8f');g.addColorStop(0.6,'#FF1493');g.addColorStop(1,'#FFD700');}
+  else{g.addColorStop(0,'#00CED1');g.addColorStop(0.6,'#ffd9a0');g.addColorStop(1,'#f3b65a');}
+  cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  // sol / luna
+  cx.fillStyle=c?'#fff3b0':'#FFD700';cx.beginPath();cx.arc(660,80,c?30:45,0,7);cx.fill();
+  if(c){
+    [[0.25,110,'#1d2470'],[0.5,80,'#2b3aa8']].forEach(([f,bw,col],L)=>{
+      const off=G.scroll*f;
+      for(let i=Math.floor(off/bw);i<Math.floor(off/bw)+W/bw+2;i++){
+        const h=90+Math.abs(hash(i+L*50))*(L?150:200),x=i*bw-off;
+        cx.fillStyle=col;cx.fillRect(x,SUELO-h,bw-6,h);
+        cx.fillStyle=(i%2)?'#FFD700':'#00CED1';
+        for(let y=SUELO-h+10;y<SUELO-12;y+=22)for(let k=8;k<bw-18;k+=20)if(Math.abs(hash(i*7+y+k))>0.35)cx.fillRect(x+k,y,8,10);
+      }
+    });
+  }else{
+    [[0.2,'#e8a24a',200,70],[0.45,'#d68a30',260,50]].forEach(([f,col,w,h])=>{
+      const off=G.scroll*f;cx.fillStyle=col;
+      for(let i=Math.floor(off/w)-1;i<Math.floor(off/w)+W/w+2;i++){
+        const x=i*w-off;cx.beginPath();cx.moveTo(x,SUELO);cx.quadraticCurveTo(x+w/2,SUELO-h*2,x+w,SUELO);cx.fill();}
+    });
+    // cactus
+    const off=G.scroll*0.8;cx.fillStyle='#2e8b3d';
+    for(let i=Math.floor(off/260);i<Math.floor(off/260)+5;i++){const x=i*260-off+100;
+      cx.fillRect(x,SUELO-46,10,46);cx.fillRect(x-12,SUELO-34,12,6);cx.fillRect(x-12,SUELO-46,6,18);cx.fillRect(x+10,SUELO-28,12,6);cx.fillRect(x+16,SUELO-40,6,18);}
+  }
+  // suelo
+  cx.fillStyle=c?'#33384f':'#d9a24a';cx.fillRect(0,SUELO,W,H-SUELO);
+  cx.fillStyle=c?'#00CED1':'#b8832f';
+  const off=G.scroll%80;for(let x=-off;x<W;x+=80)cx.fillRect(x,SUELO+30,40,5);
+}
+function balon(b){
+  cx.save();cx.translate(b.x,b.y);cx.rotate(b.rot);const r=b.r;
+  const col=['#fff','#ff8c1a','#fff','#fff'][b.t];
+  cx.fillStyle=col;cx.beginPath();cx.arc(0,0,r,0,7);cx.fill();cx.strokeStyle='#222';cx.lineWidth=2;cx.stroke();
+  if(b.t===0){cx.fillStyle='#222';cx.beginPath();for(let i=0;i<5;i++){const a=i*1.2566;cx.lineTo(Math.cos(a)*r*.45,Math.sin(a)*r*.45);}cx.fill();
+    for(let i=0;i<5;i++){const a=i*1.2566;cx.beginPath();cx.moveTo(Math.cos(a)*r*.45,Math.sin(a)*r*.45);cx.lineTo(Math.cos(a)*r,Math.sin(a)*r);cx.stroke();}}
+  if(b.t===1){cx.beginPath();cx.moveTo(-r,0);cx.lineTo(r,0);cx.moveTo(0,-r);cx.lineTo(0,r);cx.arc(-r*1.1,0,r*.8,-1,1);cx.arc(r*1.1,0,r*.8,2.1,4.2);cx.stroke();}
+  if(b.t===2){cx.fillStyle='#4169E1';cx.beginPath();cx.arc(0,0,r,0.3,1.8);cx.lineTo(0,0);cx.fill();cx.fillStyle='#FFD700';cx.beginPath();cx.arc(0,0,r,2.4,3.9);cx.lineTo(0,0);cx.fill();}
+  if(b.t===3){cx.strokeStyle='#d11';cx.beginPath();cx.arc(-r*1.2,0,r*.9,-.7,.7);cx.stroke();cx.beginPath();cx.arc(r*1.2,0,r*.9,2.4,3.9);cx.stroke();}
+  cx.restore();
+}
+function gema(g){
+  cx.save();cx.translate(g.x,g.y+Math.sin(G.t*5+g.x)*3);
+  cx.fillStyle='#00CED1';cx.strokeStyle='#fff';cx.lineWidth=2;
+  cx.beginPath();cx.moveTo(0,-13);cx.lineTo(11,-3);cx.lineTo(0,13);cx.lineTo(-11,-3);cx.closePath();cx.fill();cx.stroke();cx.restore();
+}
+function oso(){
+  const o=G.oso;if(o.inv>0&&Math.floor(G.t*14)%2)return;
+  const x=o.x,y=o.y,p=o.suelo?Math.sin(G.t*16)*8:6;
+  cx.fillStyle='#6b3f1d';cx.fillRect(x-14,y-14,10,14+(o.suelo?p/4:0));cx.fillRect(x+6,y-14,10,14-(o.suelo?p/4:0)); // patas
+  cx.fillStyle='#8B5A2B';cx.beginPath();cx.ellipse(x,y-30,22,24,0,0,7);cx.fill();                              // cuerpo
+  cx.fillStyle='#FF1493';cx.beginPath();cx.ellipse(x,y-28,20,16,0,0,7);cx.fill();                              // camiseta
+  cx.fillStyle='#fff';cx.font='bold 14px Arial';cx.textAlign='center';cx.fillText('10',x,y-23);
+  cx.fillStyle='#8B5A2B';cx.beginPath();cx.arc(x+12,y-58,16,0,7);cx.fill();                                      // cabeza
+  cx.beginPath();cx.arc(x+2,y-72,6,0,7);cx.arc(x+22,y-72,6,0,7);cx.fill();                                     // orejas
+  cx.fillStyle='#e0b889';cx.beginPath();cx.ellipse(x+19,y-53,9,7,0,0,7);cx.fill();                              // hocico
+  cx.fillStyle='#000';cx.beginPath();cx.arc(x+22,y-56,2.5,0,7);cx.arc(x+14,y-62,2.5,0,7);cx.fill();
+  cx.fillStyle='#FFD700';cx.fillRect(x-4,y-76,32,5);                                                            // vincha
+  cx.textAlign='left';
+}
+function dibujar(){
+  dibujarFondo();G.gemas.forEach(gema);G.obs.forEach(balon);oso();
+  if(G.banner>0){cx.fillStyle='#000a';cx.fillRect(0,130,W,70);cx.fillStyle='#FFD700';cx.font='bold 30px Arial';cx.textAlign='center';cx.fillText(G.bannerTxt,W/2,175);cx.textAlign='left';}
+}
+function bucle(ts){
+  const dt=Math.min((ts-ultimo)/1000||0,0.05);ultimo=ts;
+  actualizar(dt);dibujar();
+  if(!G.fin)raf=requestAnimationFrame(bucle);
+}
+
+/* ---------- Preguntas ---------- */
+function lanzarPregunta(){
+  G.esperando=true;G.tq=0;const P=PREG[G.idx];G.opciones=P.o;
+  const q=$('qin');q.innerHTML='';
+  const t=document.createElement('h3');t.textContent='Reto '+(G.idx+1)+': '+P.q;q.appendChild(t);
+  P.o.forEach((txt,i)=>{
+    const b=document.createElement('button');b.className='op';b.textContent=(i+1)+'. '+txt;b.onclick=()=>responder(i);b.id='op'+i;q.appendChild(b);
+  });
+  const fb=document.createElement('div');fb.id='fb';q.appendChild(fb);
+  $('qbox').classList.add('on');
+}
+function responder(i){
+  if(G.respondida)return;G.respondida=true;
+  const P=PREG[G.idx],ok=i===P.c,fb=$('fb');
+  document.querySelectorAll('.op').forEach(b=>b.disabled=true);
+  $('op'+P.c).classList.add('ok');
+  if(ok){G.aciertos++;G.score+=50;sfx('ok');fb.textContent='✅ ¡Correcto! +50 puntos. '+P.e;}
+  else{G.vidas--;$('op'+i).classList.add('mal');sfx('mal');fb.textContent='❌ Incorrecto, pierden una vida. '+P.e;}
+  actualizarHUD();
+  const b=document.createElement('button');b.className='btn oro';
+  const termina=G.vidas<=0||G.idx>=TOTAL-1;
+  b.textContent=termina?'🏆 Ver resultado':'▶ Continuar';
+  b.onclick=()=>siguiente(termina);$('qin').appendChild(b);
+}
+function siguiente(termina){
+  G.respondida=false;$('qbox').classList.remove('on');
+  if(termina){terminar();return;}
+  G.idx++;G.obs=[];G.gemas=[];
+  G.mundo=G.mundo==='ciudad'?'desierto':'ciudad'; // cambio de mundo
+  G.banner=2.2;G.bannerTxt=G.mundo==='ciudad'?'🏙️ ¡Bienvenidos a la Ciudad!':'🏜️ ¡Bienvenidos al Desierto!';
+  G.esperando=false;ultimo=performance.now();actualizarHUD();
+}
+
+/* ================= FIN Y RESULTADOS ================= */
+function terminar(){
+  G.fin=true;cancelAnimationFrame(raf);sfx('fin');
+  const respondidas=G.respondida===false&&G.idx<TOTAL?G.idx+1:TOTAL;
+  const pct=Math.round(G.aciertos/TOTAL*100);
+  const niv=pct>=90?5:pct>=75?4:pct>=60?3:pct>=40?2:1;
+  const nom=['','Necesita mejorar','En proceso','Aceptable','Bueno','Excelente'];
+  $('rEq').innerHTML='';
+  integrantes.forEach(n=>{const c=document.createElement('span');c.className='chip';c.textContent='👤 '+n;$('rEq').appendChild(c);});
+  $('rPun').textContent=G.score;
+  $('rAc').textContent='Aciertos: '+G.aciertos+' de '+TOTAL+' retos ('+pct+'%)';
+  $('rNiv').textContent='Nivel '+niv+' – '+nom[niv]+' '+'⭐'.repeat(niv);
+  mostrar('s4');
+}
+
+/* ================= NAVEGACIÓN ================= */
+function empezar(){
+  mostrar('s3');nuevaPartida();$('qbox').classList.remove('on');
+  G.banner=2.5;G.bannerTxt='🏙️ ¡Torneo la palma: a la Ciudad!';
+  cancelAnimationFrame(raf);ultimo=performance.now();raf=requestAnimationFrame(bucle);
+}
+$('jugar').onclick=empezar;
+$('otra').onclick=empezar;   // mantiene los nombres del grupo en memoria
+pintarLista();validar();
+</script>
+</body>
+</html>

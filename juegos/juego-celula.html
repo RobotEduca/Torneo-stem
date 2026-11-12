@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Celi escapa de los virus · Torneo ENS Divina Providencia</title>
+<style>
+/* ===================== VARIABLES DE COLOR (Mundo: La Montaña) ===================== */
+:root{
+  --noche:#0b1a33; --noche2:#132a4d; --tarjeta:#16305a; --borde:#2d4f80;
+  --hielo:#cfe8ff; --azul:#4d8fe6; --roca:#5b6575; --nieve:#f4f8ff;
+  --rojo:#e04848; --verde:#3fbf62; --dorado:#f5c042; --texto:#f4f8ff; --suave:#b8c8e0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:linear-gradient(180deg,var(--noche) 0%,#0e2342 60%,#1a2f4f 100%);
+  color:var(--texto);min-height:100vh;line-height:1.5;font-size:17px;
+}
+button,input{font-family:inherit;font-size:inherit}
+:focus-visible{outline:3px solid var(--dorado);outline-offset:3px}
+
+/* ===================== ENCABEZADO ===================== */
+.top{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 16px;background:rgba(5,12,26,.75);border-bottom:2px solid var(--borde);
+  position:sticky;top:0;z-index:20;backdrop-filter:blur(4px)
+}
+.marca{display:flex;align-items:center;gap:10px;min-width:0}
+.marca .logo{font-size:28px}
+.marca strong{display:block;font-size:clamp(14px,3.6vw,19px);color:var(--dorado);line-height:1.2}
+.marca small{display:block;font-size:12.5px;color:var(--suave)}
+.btn-sonido{
+  min-width:44px;min-height:44px;border-radius:10px;border:2px solid var(--borde);
+  background:var(--tarjeta);color:var(--texto);cursor:pointer;padding:0 12px;font-weight:700;white-space:nowrap
+}
+
+/* ===================== PANTALLAS ===================== */
+main{max-width:980px;margin:0 auto;padding:18px 14px 40px}
+.pantalla{display:none}
+.pantalla.activa{display:block;animation:aparecer .35s ease}
+@keyframes aparecer{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.tarjeta{background:var(--tarjeta);border:2px solid var(--borde);border-radius:16px;padding:20px;margin-bottom:16px}
+h1{font-size:clamp(24px,6vw,36px);line-height:1.15;color:var(--dorado);margin-bottom:6px}
+h2{font-size:clamp(20px,4.6vw,26px);margin-bottom:10px}
+.subtitulo{color:var(--hielo);font-size:18px;margin-bottom:14px;font-weight:600}
+.lore{
+  font-style:italic;color:var(--hielo);background:rgba(207,232,255,.07);
+  border-left:4px solid var(--azul);padding:10px 14px;border-radius:8px;margin:12px 0;font-size:15.5px
+}
+.btn{
+  min-height:48px;border:none;border-radius:12px;padding:12px 22px;font-weight:800;cursor:pointer;
+  background:var(--dorado);color:#1b1300;font-size:17px;transition:transform .1s,filter .15s
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:scale(.97)}
+.btn.sec{background:transparent;color:var(--hielo);border:2px solid var(--borde)}
+.btn.verde{background:var(--verde);color:#04210d}
+.fila-botones{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+
+/* ===================== REGISTRO ===================== */
+.fila-integrante{
+  border:2px solid var(--borde);border-radius:12px;padding:12px;margin-bottom:12px;
+  display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;background:rgba(0,0,0,.15)
+}
+.fila-integrante legend{padding:0 6px;color:var(--dorado);font-weight:700;font-size:15px}
+.campo label{display:block;font-size:14px;color:var(--suave);margin-bottom:4px;font-weight:600}
+.campo input{
+  width:100%;min-height:46px;border-radius:10px;border:2px solid var(--borde);
+  background:#0d1f3c;color:var(--texto);padding:8px 12px
+}
+.campo input.invalido{border-color:var(--rojo);background:#3a1420}
+.btn-quitar{
+  width:46px;height:46px;border-radius:10px;border:2px solid var(--rojo);background:transparent;
+  color:var(--rojo);font-size:20px;font-weight:800;cursor:pointer
+}
+.btn-quitar:disabled{opacity:.3;cursor:not-allowed}
+.btn-agregar{
+  width:100%;min-height:48px;border:2px dashed var(--azul);background:transparent;color:var(--hielo);
+  border-radius:12px;font-weight:700;cursor:pointer
+}
+.error{color:#ffb3b3;background:rgba(224,72,72,.15);border:1px solid var(--rojo);padding:10px 12px;border-radius:10px;margin-top:12px;font-weight:600}
+.lista-grupo{list-style:none;display:grid;gap:8px;margin:10px 0}
+.lista-grupo li{background:rgba(0,0,0,.2);border:1px solid var(--borde);border-radius:10px;padding:8px 12px}
+.lista-grupo .mafla{color:var(--dorado);font-weight:700}
+.instrucciones{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}
+.instrucciones div{background:rgba(0,0,0,.2);border-radius:12px;padding:12px;border:1px solid var(--borde)}
+.instrucciones b{display:block;color:var(--dorado);margin-bottom:2px}
+
+/* ===================== JUEGO ===================== */
+.hud{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.hud-dato{background:var(--tarjeta);border:2px solid var(--borde);border-radius:10px;padding:6px 12px;font-weight:700}
+.pregunta{background:#0f2647;border:2px solid var(--dorado);border-radius:12px;padding:10px 14px;margin-bottom:10px}
+.pregunta-titulo{font-size:13px;color:var(--dorado);font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+#hudPregunta{font-size:clamp(16px,4vw,20px);font-weight:700;margin:2px 0 8px}
+.opciones-hud{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.opciones-hud li{background:rgba(255,255,255,.06);border-radius:8px;padding:6px 10px;font-size:15px}
+.opciones-hud li b{display:inline-block;background:var(--hielo);color:var(--noche);border-radius:6px;padding:0 7px;margin-right:6px}
+.opciones-hud li.tachada{opacity:.4;text-decoration:line-through}
+.lienzo-wrap{position:relative;width:100%;max-width:calc(62vh * 16 / 9);margin:0 auto}
+canvas{display:block;width:100%;aspect-ratio:16/9;border-radius:12px;border:2px solid var(--borde);background:#0b1a33;touch-action:none}
+.aviso{
+  position:absolute;left:50%;top:10px;transform:translateX(-50%);max-width:92%;
+  background:rgba(5,12,26,.88);border:2px solid var(--dorado);color:var(--texto);
+  padding:6px 12px;border-radius:10px;font-size:14.5px;font-weight:600;text-align:center;
+  opacity:0;transition:opacity .25s;pointer-events:none
+}
+.aviso.ver{opacity:1}
+.controles{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;user-select:none;-webkit-user-select:none}
+.grupo-flechas{display:flex;gap:10px}
+.ctrl{
+  min-width:72px;min-height:64px;border-radius:14px;border:2px solid var(--borde);background:var(--tarjeta);
+  color:var(--texto);font-size:26px;font-weight:800;cursor:pointer;touch-action:manipulation
+}
+.ctrl:active,.ctrl.presionado{background:var(--azul)}
+.ctrl-salto{min-width:120px;background:#2b4f86;font-size:20px}
+.ayuda-teclado{font-size:13.5px;color:var(--suave);text-align:center;flex:1}
+
+/* ===================== CASO PRÁCTICO ===================== */
+.progreso{font-size:14px;color:var(--dorado);font-weight:700;margin-bottom:6px}
+.opciones-caso{display:grid;gap:10px;margin-top:12px}
+.op-caso{
+  text-align:left;min-height:52px;border-radius:12px;border:2px solid var(--borde);background:#0f2647;
+  color:var(--texto);padding:12px 14px;cursor:pointer;font-weight:600
+}
+.op-caso:hover:not(:disabled){border-color:var(--hielo)}
+.op-caso.bien{border-color:var(--verde);background:rgba(63,191,98,.2)}
+.op-caso.mal{border-color:var(--rojo);background:rgba(224,72,72,.2)}
+.op-caso:disabled{cursor:default}
+.retro{margin-top:14px;padding:12px 14px;border-radius:12px;font-weight:600}
+.retro.bien{background:rgba(63,191,98,.15);border:2px solid var(--verde)}
+.retro.mal{background:rgba(224,72,72,.15);border:2px solid var(--rojo)}
+.lista-resumen{padding-left:22px;display:grid;gap:6px;margin:10px 0}
+
+/* ===================== FINAL ===================== */
+.puntaje-grande{font-size:clamp(40px,12vw,64px);font-weight:900;color:var(--dorado);line-height:1}
+.nivel-desempeno{display:inline-block;margin-top:8px;padding:6px 14px;border-radius:999px;font-weight:800;font-size:18px}
+.estadisticas{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+.estadisticas div{background:rgba(0,0,0,.2);border:1px solid var(--borde);border-radius:10px;padding:10px;text-align:center}
+.estadisticas b{display:block;font-size:24px;color:var(--hielo)}
+
+/* ===================== MODAL ===================== */
+.modal{position:fixed;inset:0;background:rgba(3,8,18,.78);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal[hidden]{display:none}
+.modal-caja{background:var(--tarjeta);border:3px solid var(--dorado);border-radius:18px;max-width:480px;width:100%;padding:22px;text-align:center}
+.modal-icono{font-size:46px}
+.modal-caja h3{font-size:24px;margin:6px 0;color:var(--dorado)}
+.modal-caja p{margin-bottom:8px}
+.modal-extra{font-weight:800;color:var(--verde);font-size:20px}
+
+/* ===================== RESPONSIVO ===================== */
+@media (max-width:640px){
+  .fila-integrante{grid-template-columns:1fr}
+  .btn-quitar{width:100%}
+  .opciones-hud{grid-template-columns:1fr}
+  .ayuda-teclado{display:none}
+  .fila-botones .btn{flex:1 1 100%}
+}
+@media (hover:none){ .ayuda-teclado{display:none} }
+</style>
+</head>
+<body>
+
+<!-- ===================== ENCABEZADO ===================== -->
+<header class="top">
+  <div class="marca">
+    <span class="logo" aria-hidden="true">🏔️</span>
+    <div>
+      <strong>Torneo ENS Divina Providencia</strong>
+      <small>Maflaverse · Mundo: La Montaña</small>
+    </div>
+  </div>
+  <button id="btnSonido" class="btn-sonido" aria-pressed="false" aria-label="Silenciar sonido">🔊 Sonido</button>
+</header>
+
+<main>
+  <!-- ===================== 1. REGISTRO ===================== -->
+  <section id="pantRegistro" class="pantalla activa" aria-labelledby="tRegistro">
+    <div class="tarjeta">
+      <h1 id="tRegistro">Torneo ENS Divina Providencia</h1>
+      <p class="subtitulo">Registro del grupo</p>
+      <p class="lore">En las cumbres nevadas del Maflaverse, dragones y duendes libran batallas ancestrales. Escriban sus nombres para presentarse ante los sabios de la montaña.</p>
+      <form id="formRegistro" novalidate>
+        <div id="listaIntegrantes"></div>
+        <button type="button" id="btnAgregar" class="btn-agregar">+ Agregar integrante</button>
+        <div id="errorRegistro" class="error" role="alert" hidden></div>
+        <div class="fila-botones">
+          <button type="submit" class="btn">Continuar ➜</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== 2. INICIO ===================== -->
+  <section id="pantInicio" class="pantalla" aria-labelledby="tInicio">
+    <div class="tarjeta">
+      <h1 id="tInicio">Celi escapa de los virus</h1>
+      <p class="subtitulo">Una aventura por la célula en la Montaña del Maflaverse</p>
+      <p class="lore">Los sabios de la montaña han visto virus malvados escondidos en la nieve. Ayuden a Celi, una célula valiente, a llegar a la cima y respondan las preguntas de los sabios para ganar su favor.</p>
+      <h2>¿Cómo se juega?</h2>
+      <div class="instrucciones">
+        <div><b>🏃 Moverse</b>Usen las flechas ◀ ▶ de la pantalla o del teclado.</div>
+        <div><b>⤒ Saltar</b>Toquen "Saltar" o presionen Espacio / ↑.</div>
+        <div><b>🦠 Virus</b>¡No dejen que los virus los toquen! Pueden saltarles encima para vencerlos.</div>
+        <div><b>💎 Cristales</b>Atrapen los cristales dorados: ¡tienen pistas sobre la célula!</div>
+        <div><b>❓ Bloques de hielo</b>Al final de cada nivel, salten y toquen el bloque con la respuesta correcta.</div>
+        <div><b>🏆 Meta</b>Superen 10 niveles y ayuden a un amigo con gripe.</div>
+      </div>
+      <h2>Nuestro grupo</h2>
+      <ul id="listaInicio" class="lista-grupo"></ul>
+      <div class="fila-botones">
+        <button id="btnJugar" class="btn verde">¡Jugar!</button>
+        <button id="btnEditarGrupo" class="btn sec">Editar grupo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 3. JUEGO ===================== -->
+  <section id="pantJuego" class="pantalla" aria-label="Juego de plataforma">
+    <div class="hud">
+      <div class="hud-dato">Nivel <b id="hudNivel">1</b>/10</div>
+      <div class="hud-dato">⭐ Puntos: <b id="hudPuntaje">0</b></div>
+      <div class="hud-dato">🦠 Contagios: <b id="hudContagios">0</b></div>
+    </div>
+    <div class="pregunta">
+      <p class="pregunta-titulo">📜 Pregunta del sabio de la montaña</p>
+      <p id="hudPregunta" aria-live="polite"></p>
+      <ul id="hudOpciones" class="opciones-hud"></ul>
+    </div>
+    <div class="lienzo-wrap">
+      <canvas id="lienzo" role="img" aria-label="Celi la célula corre por la montaña nevada esquivando virus"></canvas>
+      <div id="aviso" class="aviso" role="status" aria-live="polite"></div>
+    </div>
+    <div class="controles">
+      <div class="grupo-flechas">
+        <button class="ctrl" data-control="izq" aria-label="Mover a la izquierda">◀</button>
+        <button class="ctrl" data-control="der" aria-label="Mover a la derecha">▶</button>
+      </div>
+      <p class="ayuda-teclado">Teclado: ← → (o A / D) para moverse · Espacio o ↑ para saltar</p>
+      <button class="ctrl ctrl-salto" data-control="salto" aria-label="Saltar">⤒ Saltar</button>
+    </div>
+  </section>
+
+  <!-- ===================== 4. CASO PRÁCTICO ===================== -->
+  <section id="pantCaso" class="pantalla" aria-labelledby="tCaso">
+    <div class="tarjeta" id="cajaCaso">
+      <h1 id="tCaso">El caso de la gripe</h1>
+      <p class="lore">Goro, un duende amigo de la montaña, amaneció con fiebre, tos y mocos. ¡Tiene gripe! La gripe la causa un virus que entra en las células de la nariz y la garganta. Ayuden a Goro tomando buenas decisiones.</p>
+      <p class="progreso" id="casoProgreso"></p>
+      <h2 id="casoPregunta"></h2>
+      <div id="casoOpciones" class="opciones-caso"></div>
+      <div id="casoRetro" class="retro" role="status" aria-live="polite" hidden></div>
+      <div class="fila-botones"><button id="btnCasoSig" class="btn" hidden>Siguiente ➜</button></div>
+    </div>
+    <div class="tarjeta" id="cajaResumenCaso" hidden>
+      <h2>📚 Lo que aprendimos con la gripe</h2>
+      <ul class="lista-resumen">
+        <li>La gripe la causa un <b>virus</b>, no el frío ni el helado.</li>
+        <li>El virus se mete en las <b>células</b> de la nariz y la garganta para hacer copias.</li>
+        <li>Al estornudar o toser hay que <b>taparse con el codo</b>.</li>
+        <li><b>Lavarse las manos</b> con agua y jabón saca los virus de la piel.</li>
+        <li>Los <b>glóbulos blancos</b> nos defienden; el descanso, los líquidos y el médico los ayudan.</li>
+        <li>Quedarse en casa cuando estamos enfermos <b>protege a los demás</b>.</li>
+      </ul>
+      <p id="casoPuntos" class="subtitulo"></p>
+      <div class="fila-botones"><button id="btnVerResultado" class="btn verde">Ver resultado del torneo 🏆</button></div>
+    </div>
+  </section>
+
+  <!-- ===================== 5. RESULTADO FINAL ===================== -->
+  <section id="pantFinal" class="pantalla" aria-labelledby="tFinal">
+    <div class="tarjeta">
+      <h1 id="tFinal">Resultado del Torneo ENS Divina Providencia</h1>
+      <p class="lore" id="loreFinal"></p>
+      <h2>Integrantes del grupo</h2>
+      <ul id="listaFinal" class="lista-grupo"></ul>
+      <h2>Puntaje total</h2>
+      <div class="puntaje-grande" id="finalPuntaje">0</div>
+      <div class="nivel-desempeno" id="finalNivel"></div>
+      <div class="estadisticas">
+        <div><b id="estPreguntas">0</b>preguntas acertadas al primer intento</div>
+        <div><b id="estCaso">0</b>decisiones correctas en el caso</div>
+        <div><b id="estVirus">0</b>virus vencidos</div>
+        <div><b id="estContagios">0</b>contagios recibidos</div>
+      </div>
+    </div>
+    <div class="tarjeta">
+      <h2>🧠 Conceptos clave aprendidos</h2>
+      <ul class="lista-resumen" id="listaConceptos"></ul>
+      <div class="fila-botones">
+        <button id="btnJugarDeNuevo" class="btn verde">Jugar de nuevo</button>
+        <button id="btnVolverInicio" class="btn sec">Volver al inicio</button>
+        <button id="btnNuevoGrupo" class="btn sec">Registrar otro grupo</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===================== VENTANA EMERGENTE ===================== -->
+<div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo" hidden>
+  <div class="modal-caja">
+    <div class="modal-icono" id="modalIcono"></div>
+    <h3 id="modalTitulo"></h3>
+    <p id="modalTexto"></p>
+    <p id="modalExtra" class="modal-extra"></p>
+    <button id="modalBoton" class="btn">Continuar</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* =====================================================================
+   DATOS PEDAGÓGICOS: 10 preguntas sobre la célula (grado 3)
+   - ops[0] es SIEMPRE la respuesta correcta (luego se baraja)
+   - datos: 3 pistas que dan los cristales dorados del nivel
+   ===================================================================== */
+const PREGUNTAS = [
+  { p:'¿Qué es una célula?',
+    ops:['La parte más pequeña de un ser vivo','Una piedra de la montaña','Un juguete muy pequeño'],
+    exp:'¡Muy bien! La célula es la parte más pequeña que forma a todos los seres vivos. ¡Tu cuerpo tiene millones y millones!',
+    pista:'Piensa en los ladrillos que forman una casa: los seres vivos también tienen "ladrillitos".',
+    datos:['Las células son como ladrillitos que forman a los seres vivos.','Casi todas las células son tan pequeñas que no las vemos a simple vista.','¡Tu cuerpo está hecho de millones de células!'] },
+  { p:'¿Qué parte de la célula es como el "jefe" que da las órdenes?',
+    ops:['El núcleo','La membrana','El citoplasma'],
+    exp:'¡Exacto! El núcleo es como el jefe de la célula: guarda las instrucciones y da las órdenes.',
+    pista:'Es una bolita que está en el centro de la célula.',
+    datos:['El núcleo está en el centro de la célula.','El núcleo guarda las instrucciones de la célula.','Sin núcleo, la célula no sabría qué hacer.'] },
+  { p:'¿Qué parte cubre y protege a la célula, como si fuera su piel?',
+    ops:['La membrana','El núcleo','La mitocondria'],
+    exp:'¡Así es! La membrana rodea a la célula como una piel: la protege y decide qué entra y qué sale.',
+    pista:'Es la capa de afuera, como el abrigo de la célula.',
+    datos:['La membrana es la capa que rodea a la célula.','La membrana deja entrar el alimento y sacar la basura.','La membrana es como el abrigo de la célula.'] },
+  { p:'¿Cómo se llama la "gelatina" que hay dentro de la célula?',
+    ops:['El citoplasma','El jugo de naranja','La nieve'],
+    exp:'¡Correcto! El citoplasma es como una gelatina dentro de la célula, donde flotan todas sus partes.',
+    pista:'Su nombre empieza por "cito", que significa célula.',
+    datos:['Dentro de la célula hay una gelatina llamada citoplasma.','En el citoplasma flotan las partes de la célula.','El citoplasma tiene mucha agua.'] },
+  { p:'¿Qué seres están formados por células?',
+    ops:['Las plantas, los animales y las personas','Solo las personas','Las rocas y la nieve'],
+    exp:'¡Bien! Todos los seres vivos están hechos de células: plantas, animales, hongos y personas. Las rocas no están vivas, ¡no tienen células!',
+    pista:'Todos los seres VIVOS tienen células. ¿Una roca está viva?',
+    datos:['Los dragones y los duendes también tendrían células.','Los árboles de la montaña están hechos de células.','Las rocas y la nieve no están vivas: no tienen células.'] },
+  { p:'¿Con qué instrumento podemos ver las células?',
+    ops:['El microscopio','El telescopio','Unas gafas de sol'],
+    exp:'¡Correcto! El microscopio hace que las cosas se vean muchísimo más grandes y nos deja ver las células. El telescopio sirve para mirar las estrellas.',
+    pista:'"Micro" significa pequeño.',
+    datos:['Las células se ven con un microscopio.','El microscopio hace ver las cosas muchísimo más grandes.','El telescopio sirve para ver estrellas, no células.'] },
+  { p:'¿Qué parte le da energía a la célula, como si fuera una pila?',
+    ops:['La mitocondria','La membrana','El citoplasma'],
+    exp:'¡Genial! Las mitocondrias son como pilas: le dan energía a la célula para que pueda trabajar.',
+    pista:'Tiene un nombre largo y empieza por "mito".',
+    datos:['Las mitocondrias producen energía.','Las mitocondrias son como las pilas de la célula.','Gracias a la energía, la célula puede trabajar.'] },
+  { p:'¿Qué tienen las células de las plantas que NO tienen las de los animales?',
+    ops:['Pared celular y cloroplastos','Ojos y orejas','Patas y alas'],
+    exp:'¡Muy bien! Las células de las plantas tienen una pared dura que las protege y cloroplastos verdes que usan la luz del sol para hacer su alimento.',
+    pista:'Las plantas son verdes y usan la luz del sol para alimentarse.',
+    datos:['Las células de las plantas tienen una pared dura.','Los cloroplastos son verdes y usan la luz del sol.','Las células animales no tienen cloroplastos.'] },
+  { p:'¿Qué hace un virus cuando entra en nuestro cuerpo?',
+    ops:['Se mete en nuestras células y hace copias de sí mismo','Nos da energía para correr','Nos ayuda a crecer más rápido'],
+    exp:'¡Exacto! Los virus se meten en nuestras células y las usan para hacer copias de sí mismos. Por eso nos enfermamos, como cuando nos da gripe.',
+    pista:'Los virus son los malos de este juego... ¿qué crees que hacen con las células?',
+    datos:['Los virus son mucho más pequeños que las células.','Los virus necesitan entrar en una célula para copiarse.','La gripe la causa un virus.'] },
+  { p:'¿Qué células de nuestro cuerpo nos defienden de los virus?',
+    ops:['Los glóbulos blancos','Los glóbulos rojos','Las células del pelo'],
+    exp:'¡Excelente! Los glóbulos blancos son las células defensoras: buscan a los virus y luchan contra ellos para que nos curemos.',
+    pista:'Son los "guardianes" de la sangre y su color es como la nieve.',
+    datos:['En la sangre viajan glóbulos rojos y glóbulos blancos.','Los glóbulos rojos llevan oxígeno por el cuerpo.','Los glóbulos blancos son los guardianes del cuerpo.'] }
+];
+
+/* Caso práctico: la gripe (5 decisiones, cada opción con retroalimentación) */
+const CASO = [
+  { p:'Goro va a estornudar en el salón. ¿Qué debe hacer?',
+    ops:[
+      { t:'Taparse con el codo (la parte de adentro del brazo)', ok:true, fb:'¡Muy bien! Al taparse con el codo, los virus de la gripe no salen volando ni quedan en sus manos.' },
+      { t:'Estornudar al aire sin taparse', ok:false, fb:'No es buena idea: las gotitas del estornudo llevan virus que pueden llegar a las células de otros niños.' },
+      { t:'Taparse con la mano y luego tocar los juguetes', ok:false, fb:'¡Cuidado! Los virus se quedan en la mano y pasan a los juguetes. Es mejor usar el codo.' },
+      { t:'Aguantarse el estornudo', ok:false, fb:'Aguantarse no es sano. Lo correcto es estornudar tapándose con el codo.' } ] },
+  { p:'¿Qué causa la gripe de Goro?',
+    ops:[
+      { t:'Un virus que entró a las células de su nariz y garganta', ok:true, fb:'¡Correcto! La gripe la causa un virus que se mete en las células para hacer copias de sí mismo.' },
+      { t:'Comer helado', ok:false, fb:'El helado no causa gripe. La gripe la causa un virus.' },
+      { t:'Jugar en la nieve de la montaña', ok:false, fb:'El frío no causa la gripe por sí solo. El culpable es un virus.' } ] },
+  { p:'¿Cuál es la mejor forma de quitar los virus de las manos?',
+    ops:[
+      { t:'Lavarse las manos con agua y jabón', ok:true, fb:'¡Excelente! El agua y el jabón arrastran los virus y los sacan de tu piel.' },
+      { t:'Soplarse las manos', ok:false, fb:'Soplar no quita los virus. Hay que usar agua y jabón.' },
+      { t:'Limpiarse las manos en la ropa', ok:false, fb:'Así los virus pasan a la ropa y siguen ahí. ¡Agua y jabón es lo mejor!' } ] },
+  { p:'Goro está en casa. ¿Qué ayuda a sus glóbulos blancos a vencer al virus?',
+    ops:[
+      { t:'Descansar, tomar líquidos y hacer caso al médico', ok:true, fb:'¡Así es! Con descanso, agua y los cuidados del médico, los glóbulos blancos tienen fuerza para luchar contra el virus.' },
+      { t:'Salir a correr bajo la nieve', ok:false, fb:'Cuando estamos enfermos, el cuerpo necesita descansar para que los glóbulos blancos trabajen.' },
+      { t:'No comer nada en todo el día', ok:false, fb:'El cuerpo necesita alimento para que sus células tengan energía y puedan defenderse.' },
+      { t:'Comer solo dulces', ok:false, fb:'Los dulces no ayudan a curarse. Es mejor comer sano y tomar líquidos.' } ] },
+  { p:'¿Por qué Goro debe quedarse en casa unos días?',
+    ops:[
+      { t:'Para descansar y no contagiar a sus compañeros', ok:true, fb:'¡Muy bien! Quedarse en casa evita que el virus llegue a las células de otros niños.' },
+      { t:'Porque el colegio está cerrado', ok:false, fb:'El colegio está abierto. Goro se queda en casa para curarse y no contagiar a nadie.' },
+      { t:'Para jugar videojuegos todo el día', ok:false, fb:'¡Ja! La idea es descansar para curarse y proteger a los demás del virus.' } ] }
+];
+
+/* Conceptos clave para la pantalla final */
+const CONCEPTOS = [
+  'La <b>célula</b> es la parte más pequeña de un ser vivo.',
+  'El <b>núcleo</b> es el "jefe" que guarda las instrucciones de la célula.',
+  'La <b>membrana</b> protege la célula como una piel.',
+  'El <b>citoplasma</b> es la gelatina donde flotan las partes de la célula.',
+  'Las <b>mitocondrias</b> dan energía como si fueran pilas.',
+  'Las células de las plantas tienen <b>pared celular</b> y <b>cloroplastos</b>.',
+  'Las células se ven con un <b>microscopio</b>.',
+  'Los <b>virus</b> entran en las células para copiarse y nos enferman (como la gripe).',
+  'Los <b>glóbulos blancos</b> nos defienden de los virus.',
+  'Taparse con el codo y <b>lavarse las manos</b> evita contagiar la gripe.'
+];
+
+const NIVELES_DESEMPENO = {
+  1:{ nombre:'Insuficiente', color:'#e04848' },
+  2:{ nombre:'Deficiente',   color:'#f08a3c' },
+  3:{ nombre:'Aceptable',    color:'#f5c042' },
+  4:{ nombre:'Bueno',        color:'#7fd36b' },
+  5:{ nombre:'Excelente',    color:'#3fbf62' }
+};
+
+/* =====================================================================
+   ESTADO EN MEMORIA (sin localStorage ni sessionStorage)
+   ===================================================================== */
+const grupo = { integrantes: [] };
+const estado = {
+  nivel:0, puntaje:0, ptsPreguntas:0, ptsCaso:0, contagios:0, virusVencidos:0,
+  aciertosPrimera:0, decisionesBien:0, intentos:0, pasoCaso:0, activo:false, pausado:false
+};
+const MAX_PTS_PREGUNTAS = 1000, MAX_PTS_CASO = 250;
+
+/* Atajo para buscar elementos */
+const $ = (sel) => document.querySelector(sel);
+
+/* =====================================================================
+   SONIDO: todo generado con Web Audio API (estilo "terror")
+   ===================================================================== */
+const Sonido = {
+  ctx:null, master:null, sfx:null, mus:null, ruido:null,
+  silenciado:false, musicaActiva:false, nodos:[], gDrone:null, intervalo:null, paso:0,
+
+  /* Crea el contexto de audio (debe llamarse tras un toque o clic) */
+  iniciar(){
+    if(this.ctx){ if(this.ctx.state === 'suspended') this.ctx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    this.ctx = new AC();
+    this.master = this.ctx.createGain();
+    this.master.gain.value = this.silenciado ? 0 : 0.7;
+    this.master.connect(this.ctx.destination);
+    this.sfx = this.ctx.createGain(); this.sfx.gain.value = 0.8; this.sfx.connect(this.master);
+    this.mus = this.ctx.createGain(); this.mus.gain.value = 0.5; this.mus.connect(this.master);
+    // Ruido blanco reutilizable (viento, golpes)
+    const largo = this.ctx.sampleRate * 2;
+    this.ruido = this.ctx.createBuffer(1, largo, this.ctx.sampleRate);
+    const d = this.ruido.getChannelData(0);
+    for(let i=0;i<largo;i++) d[i] = Math.random()*2 - 1;
+  },
+
+  /* Toca un tono simple con envolvente */
+  tono(f, dur, { tipo='sine', vol=0.25, cuando=0, hasta=null, destino=null, ataque=0.01 } = {}){
+    if(!this.ctx) return;
+    const t0 = this.ctx.currentTime + cuando;
+    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = tipo;
+    o.frequency.setValueAtTime(f, t0);
+    if(hasta) o.frequency.exponentialRampToValueAtTime(hasta, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + Math.min(ataque, dur*0.9));
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(destino || this.sfx);
+    o.start(t0); o.stop(t0 + dur + 0.05);
+  },
+
+  /* Ráfaga de ruido filtrado */
+  ruidoCorto(dur, { vol=0.2, frec=800, q=1, cuando=0, hasta=null, destino=null } = {}){
+    if(!this.ctx) return;
+    const t0 = this.ctx.currentTime + cuando;
+    const src = this.ctx.createBufferSource(); src.buffer = this.ruido;
+    const fil = this.ctx.createBiquadFilter(); fil.type = 'bandpass'; fil.Q.value = q;
+    fil.frequency.setValueAtTime(frec, t0);
+    if(hasta) fil.frequency.exponentialRampToValueAtTime(hasta, t0 + dur);
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + dur*0.4);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    src.connect(fil); fil.connect(g); g.connect(destino || this.sfx);
+    src.start(t0, Math.random()); src.stop(t0 + dur + 0.05);
+  },
+
+  /* Música de fondo en bucle: zumbido grave + latidos + notas fantasmales + viento */
+  musicaIniciar(){
+    if(!this.ctx || this.musicaActiva) return;
+    this.musicaActiva = true;
+    const c = this.ctx, ahora = c.currentTime;
+    const filtro = c.createBiquadFilter(); filtro.type = 'lowpass'; filtro.frequency.value = 260; filtro.Q.value = 6;
+    const gDrone = c.createGain();
+    gDrone.gain.setValueAtTime(0.0001, ahora);
+    gDrone.gain.exponentialRampToValueAtTime(0.2, ahora + 2);
+    filtro.connect(gDrone); gDrone.connect(this.mus);
+    [55, 55.7, 82.4].forEach((f, i) => {
+      const o = c.createOscillator(); o.type = i === 2 ? 'triangle' : 'sawtooth';
+      o.frequency.value = f; o.connect(filtro); o.start(); this.nodos.push(o);
+    });
+    const lfo = c.createOscillator(); lfo.frequency.value = 0.12;
+    const lg = c.createGain(); lg.gain.value = 120;
+    lfo.connect(lg); lg.connect(filtro.frequency); lfo.start();
+    this.nodos.push(lfo, lg, filtro, gDrone);
+    this.gDrone = gDrone;
+    this.paso = 0;
+    const escala = [220, 261.63, 311.13, 369.99, 440, 523.25, 622.25]; // escala disminuida: suena tenebrosa
+    this.intervalo = setInterval(() => {
+      const p = this.paso++;
+      if(p % 4 === 0){ // latido de corazón
+        this.tono(62, 0.18, { vol:0.5, hasta:40, destino:this.mus });
+        this.tono(58, 0.18, { vol:0.38, hasta:38, cuando:0.22, destino:this.mus });
+      }
+      if(p % 6 === 3){ // nota fantasmal disonante
+        const f = escala[Math.floor(Math.random()*escala.length)];
+        this.tono(f, 2.2, { vol:0.07, ataque:0.6, destino:this.mus });
+        this.tono(f*1.06, 2.2, { vol:0.035, ataque:0.6, destino:this.mus });
+      }
+      if(p % 16 === 10){ // viento helado de la montaña
+        this.ruidoCorto(3, { vol:0.06, frec:400, hasta:1200, q:8, destino:this.mus });
+      }
+    }, 300);
+  },
+
+  musicaDetener(){
+    if(!this.musicaActiva) return;
+    this.musicaActiva = false;
+    clearInterval(this.intervalo);
+    const t = this.ctx.currentTime;
+    if(this.gDrone){
+      this.gDrone.gain.cancelScheduledValues(t);
+      this.gDrone.gain.setValueAtTime(Math.max(this.gDrone.gain.value, 0.0001), t);
+      this.gDrone.gain.exponentialRampToValueAtTime(0.0001, t + 0.8);
+    }
+    const viejos = this.nodos; this.nodos = [];
+    setTimeout(() => viejos.forEach(n => {
+      try{ if(n.stop) n.stop(); }catch(e){}
+      try{ n.disconnect(); }catch(e){}
+    }), 900);
+  },
+
+  alternar(){
+    this.silenciado = !this.silenciado;
+    if(this.master) this.master.gain.setTargetAtTime(this.silenciado ? 0 : 0.7, this.ctx.currentTime, 0.05);
+    return this.silenciado;
+  },
+
+  /* ---- Efectos ---- */
+  boton(){ this.tono(620, 0.07, { tipo:'triangle', vol:0.15 }); },
+  salto(){ this.tono(300, 0.14, { tipo:'square', vol:0.06, hasta:620 }); },
+  cristal(){ this.tono(1200, 0.12, { vol:0.15 }); this.tono(1600, 0.18, { vol:0.12, cuando:0.08 }); },
+  aplastar(){ this.tono(500, 0.15, { tipo:'square', vol:0.1, hasta:120 }); this.ruidoCorto(0.15, { vol:0.15, frec:1500 }); },
+  golpe(){ this.tono(140, 0.4, { tipo:'sawtooth', vol:0.2, hasta:50 }); this.ruidoCorto(0.3, { vol:0.25, frec:300 }); },
+  acierto(){ [523.25, 659.25, 783.99].forEach((f,i) => this.tono(f, 0.2, { tipo:'triangle', vol:0.2, cuando:i*0.1 })); },
+  error(){ this.tono(220, 0.45, { tipo:'sawtooth', vol:0.14, hasta:110 }); this.tono(233, 0.45, { tipo:'sawtooth', vol:0.1, hasta:116 }); },
+  victoria(){
+    [523.25, 659.25, 783.99, 1046.5].forEach((f,i) => this.tono(f, 0.3, { tipo:'triangle', vol:0.2, cuando:i*0.15 }));
+    [523.25, 659.25, 783.99].forEach(f => this.tono(f, 1.2, { tipo:'sine', vol:0.12, cuando:0.65 }));
+  },
+  derrota(){ [392, 349.23, 311.13, 261.63].forEach((f,i) => this.tono(f, 0.45, { tipo:'triangle', vol:0.18, cuando:i*0.3 })); }
+};
+
+/* =====================================================================
+   NAVEGACIÓN ENTRE PANTALLAS
+   ===================================================================== */
+function mostrarPantalla(id){
+  document.querySelectorAll('.pantalla').forEach(p => p.classList.toggle('activa', p.id === id));
+  window.scrollTo(0, 0);
+}
+
+/* Pinta la lista de integrantes con sus Maflas en una <ul> */
+function pintarListaGrupo(ul){
+  ul.innerHTML = '';
+  grupo.integrantes.forEach(i => {
+    const li = document.createElement('li');
+    li.append('🧙 ' + i.nombre + ' — Mafla: ');
+    const s = document.createElement('span'); s.className = 'mafla'; s.textContent = i.mafla;
+    li.appendChild(s);
+    ul.appendChild(li);
+  });
+}
+
+/* =====================================================================
+   1. REGISTRO DEL GRUPO
+   ===================================================================== */
+let contadorIds = 0;
+
+function agregarIntegrante(nombre = '', mafla = ''){
+  contadorIds++;
+  const fila = document.createElement('fieldset');
+  fila.className = 'fila-integrante';
+  fila.innerHTML = `
+    <legend>Integrante <span class="num"></span></legend>
+    <div class="campo">
+      <label for="nom${contadorIds}">Nombre completo *</label>
+      <input type="text" id="nom${contadorIds}" class="in-nombre" autocomplete="off" required>
+    </div>
+    <div class="campo">
+      <label for="maf${contadorIds}">Mafla (apodo en el Maflaverse)</label>
+      <input type="text" id="maf${contadorIds}" class="in-mafla" autocomplete="off">
+    </div>
+    <button type="button" class="btn-quitar">✕</button>`;
+  fila.querySelector('.in-nombre').value = nombre;
+  fila.querySelector('.in-mafla').value = mafla;
+  fila.querySelector('.btn-quitar').addEventListener('click', () => {
+    if($('#listaIntegrantes').children.length > 1){ fila.remove(); renumerarIntegrantes(); }
+  });
+  fila.querySelector('.in-nombre').addEventListener('input', e => e.target.classList.remove('invalido'));
+  $('#listaIntegrantes').appendChild(fila);
+  renumerarIntegrantes();
+  return fila;
+}
+
+function renumerarIntegrantes(){
+  const filas = [...$('#listaIntegrantes').children];
+  filas.forEach((f, i) => {
+    f.querySelector('.num').textContent = i + 1;
+    const b = f.querySelector('.btn-quitar');
+    b.setAttribute('aria-label', 'Quitar integrante ' + (i + 1));
+    b.disabled = filas.length === 1;
+  });
+}
+
+function validarRegistro(e){
+  e.preventDefault();
+  const filas = [...$('#listaIntegrantes').children];
+  const err = $('#errorRegistro');
+  let primeraMala = null;
+  const datos = filas.map(f => {
+    const inN = f.querySelector('.in-nombre');
+    const nombre = inN.value.trim().replace(/\s+/g, ' ');
+    const mafla = f.querySelector('.in-mafla').value.trim();
+    inN.classList.toggle('invalido', !nombre);
+    inN.setAttribute('aria-invalid', !nombre);
+    if(!nombre && !primeraMala) primeraMala = inN;
+    return { nombre, mafla: mafla || 'Sin Mafla' };
+  });
+  if(primeraMala || datos.length === 0){
+    err.textContent = 'Falta escribir el nombre completo de algún integrante. Escríbelo o quita esa fila con ✕.';
+    err.hidden = false;
+    Sonido.error();
+    (primeraMala || $('#btnAgregar')).focus();
+    return;
+  }
+  err.hidden = true;
+  grupo.integrantes = datos;           // Guardado SOLO en memoria
+  pintarListaGrupo($('#listaInicio'));
+  mostrarPantalla('pantInicio');
+}
+
+/* =====================================================================
+   3. MOTOR DEL JUEGO DE PLATAFORMA
+   ===================================================================== */
+const lienzo = $('#lienzo');
+const ctx = lienzo.getContext('2d');
+const W = 800, H = 450, SUELO_Y = 400;
+const DPR = Math.min(2, window.devicePixelRatio || 1);
+lienzo.width = W * DPR; lienzo.height = H * DPR;
+ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+const jugador = { x:60, y:300, w:34, h:34, vx:0, vy:0, enSuelo:false, coyote:0, invul:0, dir:1 };
+const teclas = { izq:false, der:false, salto:false };
+let saltoPedido = 0;   // "memoria" del salto para que se sienta responsivo
+let nivel = null;
+let camX = 0;
+
+/* Copos de nieve y estrellas del fondo */
+const copos = Array.from({ length:70 }, () => ({ x:Math.random()*W, y:Math.random()*H, s:1 + Math.random()*2.5, v:0.5 + Math.random() }));
+const estrellas = Array.from({ length:40 }, () => ({ x:Math.random()*W, y:Math.random()*180, s:Math.random()*1.5 + 0.5 }));
+
+function barajar(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+/* Construye el nivel n (1 a 10): suelo, grietas, plataformas, virus, cristales y bloques de respuesta */
+function construirNivel(n){
+  const q = PREGUNTAS[n - 1];
+  const ancho = 2000 + n*120;
+
+  // Grietas de hielo (desde el nivel 3)
+  const anchoHueco = 80 + n*3;
+  const fracciones = n < 3 ? [] : n < 7 ? [0.62] : [0.35, 0.7];
+  const huecos = fracciones.map(f => ({ x:Math.round(ancho*f), w:anchoHueco }));
+
+  // Segmentos de suelo entre grietas
+  const suelos = []; let x0 = 0;
+  huecos.forEach(h => { suelos.push({ x:x0, y:SUELO_Y, w:h.x - x0, h:50 }); x0 = h.x + h.w; });
+  suelos.push({ x:x0, y:SUELO_Y, w:ancho - x0, h:50 });
+
+  // Plataformas flotantes de roca y hielo
+  const plataformas = []; let i = 0;
+  for(let px = 420; px < ancho - 760; px += 360){ plataformas.push({ x:px, y: i % 2 ? 285 : 315, w:130, h:18 }); i++; }
+
+  // Cristales dorados con datos de la célula (pistas)
+  const idxs = [0, Math.floor(plataformas.length/2), plataformas.length - 1];
+  const cristales = q.datos.map((dato, k) => {
+    const p = plataformas[idxs[k]];
+    return p ? { x:p.x + p.w/2, y:p.y - 30, dato, tomado:false } : { x:500 + k*400, y:SUELO_Y - 40, dato, tomado:false };
+  });
+
+  // Virus que patrullan el suelo
+  const virus = [];
+  const nV = Math.min(7, 2 + Math.floor(n/2));
+  const ini = 560, fin = ancho - 780;
+  for(let k = 0; k < nV; k++){
+    let vx = ini + (k + 0.5)*(fin - ini)/nV;
+    let seg = suelos.find(s => vx >= s.x + 30 && vx <= s.x + s.w - 30);
+    if(!seg){ vx += anchoHueco + 80; seg = suelos.find(s => vx >= s.x + 30 && vx <= s.x + s.w - 30); }
+    if(!seg) continue;
+    virus.push({
+      x:vx, y:SUELO_Y - 18, r:18, min:Math.max(seg.x + 20, vx - 90), max:Math.min(seg.x + seg.w - 20, vx + 90),
+      vel:(0.7 + n*0.12) * (k % 2 ? 1 : -1), vivo:true, volador:false,
+      color: k % 2 ? '#d63c3c' : '#3fae5a', fase:Math.random()*6
+    });
+  }
+  // Virus voladores (desde el nivel 4)
+  if(n >= 4){
+    const nf = Math.min(3, n - 3);
+    for(let k = 0; k < nf; k++){
+      const fx = 700 + (k + 0.5)*(ancho - 1500)/nf;
+      virus.push({ x:fx, y:230, baseY:230, r:16, min:fx - 70, max:fx + 70, vel:0.9, vivo:true, volador:true, color:'#9b3fd6', fase:k*2 });
+    }
+  }
+
+  // Bloques de hielo con las respuestas (orden aleatorio)
+  const orden = barajar([0, 1, 2]);
+  const bloques = orden.map((idxOp, k) => ({
+    x:ancho - 480 + k*150, y:235, w:80, h:60, letra:'ABC'[k], texto:q.ops[idxOp], correcta: idxOp === 0, roto:false
+  }));
+
+  nivel = { n, q, ancho, suelos, huecos, plataformas, solidos:[...suelos, ...plataformas],
+            cp:{ x:Math.round(ancho*0.5), activo:false }, cristales, virus, bloques, sabioX:ancho - 620 };
+
+  estado.intentos = 0;
+  Object.assign(jugador, { x:60, y:SUELO_Y - 50, vx:0, vy:0, enSuelo:false, invul:60, dir:1 });
+  camX = 0;
+  pintarHUDPregunta();
+  actualizarHUD();
+}
+
+function pintarHUDPregunta(){
+  $('#hudPregunta').textContent = nivel.q.p;
+  const ul = $('#hudOpciones'); ul.innerHTML = '';
+  nivel.bloques.forEach(b => {
+    const li = document.createElement('li');
+    const letra = document.createElement('b'); letra.textContent = b.letra;
+    li.appendChild(letra); li.append(b.texto);
+    if(b.roto) li.className = 'tachada';
+    ul.appendChild(li);
+  });
+}
+
+function actualizarHUD(){
+  $('#hudNivel').textContent = estado.nivel;
+  $('#hudPuntaje').textContent = estado.puntaje;
+  $('#hudContagios').textContent = estado.contagios;
+}
+
+/* Mensaje corto sobre el lienzo */
+let temporizadorAviso = null;
+function avisar(txt){
+  const a = $('#aviso');
+  a.textContent = txt; a.classList.add('ver');
+  clearTimeout(temporizadorAviso);
+  temporizadorAviso = setTimeout(() => a.classList.remove('ver'), 2800);
+}
+
+/* Devuelve a Celi al punto de control */
+function reaparecer(){
+  jugador.x = nivel.cp.activo ? nivel.cp.x : 60;
+  jugador.y = SUELO_Y - 120; jugador.vx = 0; jugador.vy = 0; jugador.invul = 100;
+}
+
+function recibirContagio(mensaje){
+  if(jugador.invul > 0) return;
+  estado.contagios++;
+  estado.puntaje = Math.max(0, estado.puntaje - 10);
+  Sonido.golpe();
+  avisar(mensaje);
+  reaparecer();
+  actualizarHUD();
+}
+
+/* Actualiza la física y las colisiones (k = factor de tiempo, 1 = 60 fps) */
+function actualizar(k){
+  const p = jugador;
+  p.vx = ((teclas.der ? 1 : 0) - (teclas.izq ? 1 : 0)) * 4.2;
+  if(p.vx) p.dir = Math.sign(p.vx);
+
+  // Salto
+  if(saltoPedido > 0){
+    if(p.enSuelo || p.coyote > 0){ p.vy = -12.8; p.enSuelo = false; p.coyote = 0; saltoPedido = 0; Sonido.salto(); }
+    else saltoPedido -= k;
+  }
+  p.vy = Math.min(p.vy + 0.6*k, 14);
+
+  // Movimiento horizontal
+  p.x = Math.max(0, Math.min(nivel.ancho - p.w, p.x + p.vx*k));
+
+  // Movimiento vertical con plataformas de un solo sentido
+  const pieAntes = p.y + p.h;
+  p.y += p.vy*k;
+  p.enSuelo = false;
+  if(p.vy >= 0){
+    for(const s of nivel.solidos){
+      if(p.x + p.w > s.x + 4 && p.x < s.x + s.w - 4 && pieAntes <= s.y + 1 && p.y + p.h >= s.y){
+        p.y = s.y - p.h; p.vy = 0; p.enSuelo = true; break;
+      }
+    }
+  }
+  p.coyote = p.enSuelo ? 6 : Math.max(0, p.coyote - k);
+  if(p.invul > 0) p.invul -= k;
+
+  // Caída en una grieta
+  if(p.y > H + 60){
+    estado.puntaje = Math.max(0, estado.puntaje - 5);
+    Sonido.golpe(); avisar('¡Caíste en una grieta de hielo! Vuelve a intentarlo.');
+    reaparecer(); actualizarHUD();
+  }
+
+  // Punto de control (bandera de los duendes)
+  if(!nivel.cp.activo && p.x > nivel.cp.x){ nivel.cp.activo = true; Sonido.cristal(); avisar('🚩 ¡Bandera de los duendes alcanzada! Aquí volverás si te contagias.'); }
+
+  // Virus
+  for(const v of nivel.virus){
+    if(!v.vivo) continue;
+    v.x += v.vel*k;
+    if(v.x < v.min || v.x > v.max){ v.vel *= -1; v.x = Math.max(v.min, Math.min(v.max, v.x)); }
+    if(v.volador){ v.fase += 0.04*k; v.y = v.baseY + Math.sin(v.fase)*40; }
+    const toca = p.x + p.w > v.x - v.r*0.8 && p.x < v.x + v.r*0.8 && p.y + p.h > v.y - v.r*0.8 && p.y < v.y + v.r*0.8;
+    if(toca){
+      if(p.vy > 0 && pieAntes <= v.y - v.r*0.2){
+        v.vivo = false; p.vy = -9; estado.puntaje += 10; estado.virusVencidos++;
+        Sonido.aplastar(); avisar('¡Virus vencido! Así trabajan los glóbulos blancos. +10'); actualizarHUD();
+      } else {
+        recibirContagio('🦠 ¡Un virus te tocó! Los virus se meten en las células y nos enferman. −10');
+      }
+    }
+  }
+
+  // Cristales dorados (datos sobre la célula)
+  for(const c of nivel.cristales){
+    if(c.tomado) continue;
+    if(Math.abs(p.x + p.w/2 - c.x) < 28 && Math.abs(p.y + p.h/2 - c.y) < 30){
+      c.tomado = true; estado.puntaje += 5; Sonido.cristal(); avisar('💎 Dato: ' + c.dato); actualizarHUD();
+    }
+  }
+
+  // Bloques de respuesta: se tocan saltando desde abajo
+  if(p.vy < 0){
+    for(const b of nivel.bloques){
+      if(b.roto) continue;
+      if(p.x + p.w > b.x + 6 && p.x < b.x + b.w - 6 && p.y <= b.y + b.h && p.y + p.h > b.y){
+        p.vy = 2; p.y = b.y + b.h;
+        elegirRespuesta(b);
+        break;
+      }
+    }
+  }
+
+  // Cámara que sigue a Celi
+  camX = Math.max(0, Math.min(nivel.ancho - W, p.x - W*0.4));
+}
+
+/* El grupo eligió un bloque de respuesta */
+function elegirRespuesta(b){
+  pausarJuego(true);
+  const q = nivel.q;
+  if(b.correcta){
+    const pts = [100, 50, 20][Math.min(estado.intentos, 2)];
+    if(estado.intentos === 0) estado.aciertosPrimera++;
+    estado.ptsPreguntas += pts; estado.puntaje += pts; actualizarHUD();
+    Sonido.acierto();
+    const ultimo = estado.nivel >= PREGUNTAS.length;
+    mostrarModal({
+      icono:'🏔️✨', titulo:'¡Correcto!', texto:q.exp, extra:'+' + pts + ' puntos',
+      boton: ultimo ? 'Ir al caso de la gripe ➜' : 'Siguiente nivel ➜',
+      alCerrar: siguienteNivel
+    });
+  } else {
+    estado.intentos++;
+    b.roto = true; pintarHUDPregunta();
+    Sonido.error();
+    mostrarModal({
+      icono:'🦠', titulo:'¡Esa no es!', texto:'«' + b.texto + '» no es la respuesta correcta. Pista del sabio: ' + q.pista,
+      extra:'', boton:'Intentar otra vez', alCerrar: () => pausarJuego(false)
+    });
+  }
+}
+
+function siguienteNivel(){
+  if(estado.nivel < PREGUNTAS.length){
+    estado.nivel++;
+    construirNivel(estado.nivel);
+    pausarJuego(false);
+    avisar('Nivel ' + estado.nivel + ': ¡salta y toca el bloque con la respuesta correcta!');
+  } else {
+    iniciarCaso();
+  }
+}
+
+function pausarJuego(si){
+  estado.pausado = si;
+  teclas.izq = teclas.der = teclas.salto = false; saltoPedido = 0;
+  document.querySelectorAll('.ctrl').forEach(b => b.classList.remove('presionado'));
+}
+
+function iniciarPartida(){
+  Object.assign(estado, { nivel:1, puntaje:0, ptsPreguntas:0, ptsCaso:0, contagios:0, virusVencidos:0,
+                          aciertosPrimera:0, decisionesBien:0, intentos:0, pasoCaso:0 });
+  mostrarPantalla('pantJuego');
+  construirNivel(1);
+  estado.activo = true;
+  pausarJuego(false);
+  Sonido.iniciar(); Sonido.musicaIniciar();
+  avisar('¡Esquiva los virus y salta para tocar la respuesta correcta!');
+}
+
+/* =====================================================================
+   DIBUJO (Mundo: La Montaña)
+   ===================================================================== */
+function dibujar(t){
+  dibujarFondo(t);
+  ctx.save();
+  ctx.translate(-Math.round(camX), 0);
+  dibujarSuelo();
+  dibujarBandera(t);
+  nivel.cristales.forEach(c => !c.tomado && dibujarCristal(c, t));
+  dibujarSabio();
+  nivel.bloques.forEach(b => dibujarBloque(b, t));
+  nivel.virus.forEach(v => v.vivo && dibujarVirus(v, t));
+  dibujarCeli(t);
+  ctx.restore();
+  dibujarNieve(t);
+  // Niebla tenebrosa
+  const g = ctx.createLinearGradient(0, H - 120, 0, H);
+  g.addColorStop(0, 'rgba(180,200,230,0)'); g.addColorStop(1, 'rgba(180,200,230,.18)');
+  ctx.fillStyle = g; ctx.fillRect(0, H - 120, W, 120);
+}
+
+function dibujarFondo(t){
+  const cielo = ctx.createLinearGradient(0, 0, 0, H);
+  cielo.addColorStop(0, '#060e1f'); cielo.addColorStop(0.6, '#1c3557'); cielo.addColorStop(1, '#3a5578');
+  ctx.fillStyle = cielo; ctx.fillRect(0, 0, W, H);
+  // Estrellas
+  ctx.fillStyle = '#dfe9ff';
+  estrellas.forEach(e => { ctx.globalAlpha = 0.4 + 0.4*Math.sin(t*0.002 + e.x); ctx.fillRect(e.x, e.y, e.s, e.s); });
+  ctx.globalAlpha = 1;
+  // Luna
+  ctx.fillStyle = 'rgba(230,240,255,.12)'; ctx.beginPath(); ctx.arc(660, 70, 52, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#e8eefc'; ctx.beginPath(); ctx.arc(660, 70, 32, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#c9d4ea'; ctx.beginPath(); ctx.arc(650, 62, 6, 0, Math.PI*2); ctx.arc(670, 82, 4, 0, Math.PI*2); ctx.fill();
+  // Dragón lejano volando
+  dibujarDragon(t);
+  // Montañas lejanas
+  dibujarCordillera(camX*0.15, 230, 70, '#2c3d58', 0.004, 0.011);
+  // Montañas cercanas con duendes
+  dibujarCordillera(camX*0.35, 310, 45, '#39465c', 0.007, 0.017);
+  dibujarDuendes();
+}
+
+function dibujarCordillera(desp, base, alto, color, f1, f2){
+  const altura = x => base - Math.abs(Math.sin((x + desp)*f1))*alto - Math.sin((x + desp)*f2)*alto*0.35;
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.moveTo(0, H);
+  for(let x = 0; x <= W; x += 20) ctx.lineTo(x, altura(x));
+  ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+  // Nieve en las cumbres
+  ctx.strokeStyle = 'rgba(244,248,255,.85)'; ctx.lineWidth = 5; ctx.beginPath();
+  for(let x = 0; x <= W; x += 20){ const y = altura(x); x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }
+  ctx.stroke();
+}
+
+function dibujarDragon(t){
+  const x = ((t*0.04) % (W + 400)) - 200;
+  const y = 120 + Math.sin(t*0.001)*20;
+  const ala = Math.sin(t*0.008)*18;
+  ctx.save(); ctx.translate(x, y); ctx.globalAlpha = 0.8;
+  ctx.fillStyle = '#8f1f24';
+  ctx.beginPath(); ctx.ellipse(0, 0, 26, 8, 0, 0, Math.PI*2); ctx.fill();               // cuerpo
+  ctx.beginPath(); ctx.moveTo(-24, 0); ctx.quadraticCurveTo(-46, 6, -58, -4); ctx.lineTo(-26, 4); ctx.fill(); // cola
+  ctx.beginPath(); ctx.arc(28, -4, 7, 0, Math.PI*2); ctx.fill();                          // cabeza
+  ctx.beginPath(); ctx.moveTo(-6, -2); ctx.lineTo(-20, -24 - ala); ctx.lineTo(10, -4); ctx.fill(); // alas
+  ctx.beginPath(); ctx.moveTo(-2, -2); ctx.lineTo(4, -28 - ala); ctx.lineTo(16, -3); ctx.fill();
+  if(Math.sin(t*0.002) > 0.7){ // llamarada dorada
+    ctx.fillStyle = '#f5c042'; ctx.beginPath(); ctx.moveTo(34, -4); ctx.lineTo(60, -10); ctx.lineTo(58, 2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function dibujarDuendes(){
+  // Pequeños duendes en las colinas cercanas (decoración de lore)
+  [300, 1100, 1900].forEach(px => {
+    let x = ((px - camX*0.35) % (W + 200) + W + 200) % (W + 200) - 100;
+    const y = 282;
+    ctx.fillStyle = '#2f8a46';
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2); ctx.fill();
+    ctx.fillRect(x - 4, y + 4, 8, 10);
+    ctx.beginPath(); ctx.moveTo(x - 5, y - 3); ctx.lineTo(x, y - 14); ctx.lineTo(x + 5, y - 3); ctx.fill();
+    ctx.strokeStyle = '#c9a25a'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x + 7, y + 14); ctx.lineTo(x + 7, y - 10); ctx.stroke();
+  });
+}
+
+function dibujarSuelo(){
+  nivel.suelos.forEach(s => {
+    ctx.fillStyle = '#4a5263'; ctx.fillRect(s.x, s.y, s.w, s.h);
+    ctx.fillStyle = '#5d6678';
+    for(let x = s.x + 10; x < s.x + s.w - 10; x += 46) ctx.fillRect(x, s.y + 20 + (x % 3)*6, 18, 6);
+    ctx.fillStyle = '#f4f8ff'; ctx.fillRect(s.x, s.y - 4, s.w, 10);
+  });
+  nivel.plataformas.forEach(pl => {
+    ctx.fillStyle = '#7fa8cf'; ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
+    ctx.fillStyle = '#aed3f2'; ctx.fillRect(pl.x, pl.y + pl.h - 5, pl.w, 5);
+    ctx.fillStyle = '#f4f8ff'; ctx.fillRect(pl.x - 2, pl.y - 4, pl.w + 4, 7);
+  });
+}
+
+function dibujarBandera(t){
+  const cp = nivel.cp;
+  ctx.fillStyle = '#c9a25a'; ctx.fillRect(cp.x, SUELO_Y - 70, 4, 70);
+  ctx.fillStyle = cp.activo ? '#3fbf62' : '#5d6678';
+  const ola = Math.sin(t*0.006)*4;
+  ctx.beginPath(); ctx.moveTo(cp.x + 4, SUELO_Y - 70); ctx.lineTo(cp.x + 36, SUELO_Y - 62 + ola); ctx.lineTo(cp.x + 4, SUELO_Y - 50); ctx.fill();
+}
+
+function dibujarCristal(c, t){
+  const y = c.y + Math.sin(t*0.004 + c.x)*4;
+  ctx.save(); ctx.translate(c.x, y);
+  ctx.shadowColor = '#f5c042'; ctx.shadowBlur = 14;
+  ctx.fillStyle = '#f5c042';
+  ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(10, 0); ctx.lineTo(0, 14); ctx.lineTo(-10, 0); ctx.closePath(); ctx.fill();
+  ctx.shadowBlur = 0; ctx.fillStyle = '#fff3c4';
+  ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(4, 0); ctx.lineTo(0, -2); ctx.fill();
+  ctx.restore();
+}
+
+function dibujarSabio(){
+  const x = nivel.sabioX, y = SUELO_Y;
+  ctx.fillStyle = '#4b3a8c';
+  ctx.beginPath(); ctx.moveTo(x - 20, y); ctx.lineTo(x, y - 60); ctx.lineTo(x + 20, y); ctx.fill();   // túnica
+  ctx.fillStyle = '#f0c9a0'; ctx.beginPath(); ctx.arc(x, y - 64, 10, 0, Math.PI*2); ctx.fill();        // cara
+  ctx.fillStyle = '#4b3a8c'; ctx.beginPath(); ctx.moveTo(x - 13, y - 66); ctx.lineTo(x, y - 94); ctx.lineTo(x + 13, y - 66); ctx.fill(); // sombrero
+  ctx.fillStyle = '#f4f8ff'; ctx.beginPath(); ctx.moveTo(x - 9, y - 60); ctx.lineTo(x, y - 34); ctx.lineTo(x + 9, y - 60); ctx.fill(); // barba
+  ctx.fillStyle = '#c9a25a'; ctx.fillRect(x + 24, y - 80, 3, 80);                                      // bastón
+  ctx.fillStyle = '#f5c042'; ctx.beginPath(); ctx.arc(x + 25, y - 84, 6, 0, Math.PI*2); ctx.fill();
+  // Globo de diálogo
+  const texto = '¡Salta y toca la respuesta!';
+  ctx.font = 'bold 14px system-ui, sans-serif';
+  const ancho = ctx.measureText(texto).width + 20;
+  ctx.fillStyle = 'rgba(244,248,255,.95)';
+  ctx.fillRect(x - ancho/2, y - 136, ancho, 28);
+  ctx.beginPath(); ctx.moveTo(x - 6, y - 108); ctx.lineTo(x, y - 98); ctx.lineTo(x + 6, y - 108); ctx.fill();
+  ctx.fillStyle = '#0b1a33'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(texto, x, y - 122);
+}
+
+function dibujarBloque(b, t){
+  if(b.roto){
+    ctx.globalAlpha = 0.35; ctx.fillStyle = '#5d6678'; ctx.fillRect(b.x, b.y, b.w, b.h);
+    ctx.strokeStyle = '#e04848'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(b.x + 10, b.y + 10); ctx.lineTo(b.x + b.w - 10, b.y + b.h - 10);
+    ctx.moveTo(b.x + b.w - 10, b.y + 10); ctx.lineTo(b.x + 10, b.y + b.h - 10); ctx.stroke();
+    ctx.globalAlpha = 1; return;
+  }
+  ctx.save();
+  ctx.shadowColor = '#cfe8ff'; ctx.shadowBlur = 10 + Math.sin(t*0.005)*6;
+  ctx.fillStyle = '#9cc9ef'; ctx.fillRect(b.x, b.y, b.w, b.h);
+  ctx.restore();
+  ctx.strokeStyle = '#f5c042'; ctx.lineWidth = 3; ctx.strokeRect(b.x + 1.5, b.y + 1.5, b.w - 3, b.h - 3);
+  ctx.fillStyle = '#0b1a33'; ctx.font = 'bold 34px system-ui, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(b.letra, b.x + b.w/2, b.y + b.h/2 + 2);
+}
+
+function dibujarVirus(v, t){
+  const pulso = 1 + Math.sin(t*0.01 + v.fase)*0.06;
+  const r = v.r*pulso;
+  ctx.save(); ctx.translate(v.x, v.y);
+  ctx.strokeStyle = v.color; ctx.fillStyle = v.color; ctx.lineWidth = 3;
+  for(let i = 0; i < 10; i++){ // espículas del virus
+    const a = i/10*Math.PI*2 + t*0.001;
+    ctx.beginPath(); ctx.moveTo(Math.cos(a)*r, Math.sin(a)*r); ctx.lineTo(Math.cos(a)*(r + 7), Math.sin(a)*(r + 7)); ctx.stroke();
+    ctx.beginPath(); ctx.arc(Math.cos(a)*(r + 8), Math.sin(a)*(r + 8), 3, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fill();
+  // Ojos malvados
+  const dir = v.vel > 0 ? 3 : -3;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(-6 + dir, -3, 5, 0, Math.PI*2); ctx.arc(6 + dir, -3, 5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.arc(-5 + dir*1.3, -2, 2.4, 0, Math.PI*2); ctx.arc(7 + dir*1.3, -2, 2.4, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#111'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(-11 + dir, -11); ctx.lineTo(-2 + dir, -7); ctx.moveTo(11 + dir, -11); ctx.lineTo(2 + dir, -7); ctx.stroke();
+  ctx.restore();
+}
+
+function dibujarCeli(t){
+  const p = jugador;
+  if(p.invul > 0 && Math.floor(t/100) % 2 === 0) return; // parpadeo de protección
+  const cx = p.x + p.w/2, cy = p.y + p.h/2;
+  ctx.save(); ctx.translate(cx, cy);
+  const estira = p.enSuelo ? 1 : 1.08;
+  ctx.scale(1/estira, estira);
+  // Membrana y citoplasma
+  ctx.fillStyle = 'rgba(160,215,255,.92)';
+  ctx.beginPath(); ctx.arc(0, 0, 17, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#eaf6ff'; ctx.lineWidth = 3; ctx.stroke();
+  // Núcleo
+  ctx.fillStyle = '#7b4bd1'; ctx.beginPath(); ctx.arc(-4*p.dir, 4, 6, 0, Math.PI*2); ctx.fill();
+  // Mitocondria
+  ctx.fillStyle = '#f08a3c'; ctx.beginPath(); ctx.ellipse(-7*p.dir, -8, 4, 2, 0.5, 0, Math.PI*2); ctx.fill();
+  // Ojos
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(5*p.dir, -4, 4, 0, Math.PI*2); ctx.arc(11*p.dir, -4, 3.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#0b1a33';
+  ctx.beginPath(); ctx.arc(6*p.dir, -4, 2, 0, Math.PI*2); ctx.arc(12*p.dir, -4, 1.8, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function dibujarNieve(t){
+  ctx.fillStyle = 'rgba(244,248,255,.85)';
+  copos.forEach(c => {
+    const y = (c.y + t*c.v*0.03) % H;
+    const x = (((c.x + Math.sin(t*0.001 + c.y)*10 - camX*0.1) % W) + W) % W;
+    ctx.beginPath(); ctx.arc(x, y, c.s, 0, Math.PI*2); ctx.fill();
+  });
+}
+
+/* Bucle principal del juego */
+let tiempoAnterior = 0;
+function bucle(t){
+  const dt = Math.min(33, (t - tiempoAnterior) || 16.67);
+  tiempoAnterior = t;
+  if(estado.activo && nivel){
+    if(!estado.pausado) actualizar(dt/16.67);
+    dibujar(t);
+  }
+  requestAnimationFrame(bucle);
+}
+
+/* =====================================================================
+   VENTANA EMERGENTE (retroalimentación)
+   ===================================================================== */
+function mostrarModal({ icono, titulo, texto, extra, boton, alCerrar }){
+  $('#modalIcono').textContent = icono;
+  $('#modalTitulo').textContent = titulo;
+  $('#modalTexto').textContent = texto;
+  $('#modalExtra').textContent = extra || '';
+  const btn = $('#modalBoton');
+  btn.textContent = boton || 'Continuar';
+  $('#modal').hidden = false;
+  btn.onclick = () => { $('#modal').hidden = true; if(alCerrar) alCerrar(); };
+  setTimeout(() => btn.focus(), 50);
+}
+
+/* =====================================================================
+   4. CASO PRÁCTICO: LA GRIPE
+   ===================================================================== */
+function iniciarCaso(){
+  estado.activo = false;
+  estado.pasoCaso = 0;
+  $('#cajaCaso').hidden = false;
+  $('#cajaResumenCaso').hidden = true;
+  mostrarPantalla('pantCaso');
+  pintarDecision();
+}
+
+function pintarDecision(){
+  const d = CASO[estado.pasoCaso];
+  $('#casoProgreso').textContent = 'Decisión ' + (estado.pasoCaso + 1) + ' de ' + CASO.length;
+  $('#casoPregunta').textContent = d.p;
+  const cont = $('#casoOpciones'); cont.innerHTML = '';
+  barajar(d.ops).forEach(op => {
+    const b = document.createElement('button');
+    b.className = 'op-caso'; b.textContent = op.t;
+    b.addEventListener('click', () => responderDecision(op, b));
+    cont.appendChild(b);
+    b._op = op;
+  });
+  $('#casoRetro').hidden = true;
+  $('#btnCasoSig').hidden = true;
+}
+
+function responderDecision(op, boton){
+  const botones = [...document.querySelectorAll('.op-caso')];
+  botones.forEach(b => { b.disabled = true; if(b._op.ok) b.classList.add('bien'); });
+  const retro = $('#casoRetro');
+  if(op.ok){
+    estado.ptsCaso += 50; estado.puntaje += 50; estado.decisionesBien++;
+    Sonido.acierto();
+    retro.className = 'retro bien'; retro.textContent = '✅ ' + op.fb + ' (+50 puntos)';
+  } else {
+    boton.classList.add('mal');
+    Sonido.error();
+    retro.className = 'retro mal'; retro.textContent = '❌ ' + op.fb;
+  }
+  retro.hidden = false;
+  const sig = $('#btnCasoSig');
+  sig.textContent = estado.pasoCaso < CASO.length - 1 ? 'Siguiente decisión ➜' : 'Ver lo aprendido ➜';
+  sig.hidden = false; sig.focus();
+}
+
+function siguienteDecision(){
+  if(estado.pasoCaso < CASO.length - 1){ estado.pasoCaso++; pintarDecision(); }
+  else {
+    $('#cajaCaso').hidden = true;
+    $('#cajaResumenCaso').hidden = false;
+    $('#casoPuntos').textContent = 'Decisiones correctas: ' + estado.decisionesBien + ' de ' + CASO.length + ' · Puntos del caso: ' + estado.ptsCaso;
+    window.scrollTo(0, 0);
+  }
+}
+
+/* =====================================================================
+   5. RESULTADO FINAL
+   ===================================================================== */
+function calcularDesempeno(){
+  const r = (estado.ptsPreguntas + estado.ptsCaso) / (MAX_PTS_PREGUNTAS + MAX_PTS_CASO);
+  if(r >= 0.9) return 5;
+  if(r >= 0.75) return 4;
+  if(r >= 0.6) return 3;
+  if(r >= 0.4) return 2;
+  return 1;
+}
+
+function mostrarFinal(){
+  Sonido.musicaDetener();
+  const nivelD = calcularDesempeno();
+  const info = NIVELES_DESEMPENO[nivelD];
+  pintarListaGrupo($('#listaFinal'));
+  $('#finalPuntaje').textContent = estado.puntaje;
+  const etiqueta = $('#finalNivel');
+  etiqueta.textContent = 'Nivel ' + nivelD + ' · ' + info.nombre;
+  etiqueta.style.background = info.color; etiqueta.style.color = '#0b1a33';
+  $('#estPreguntas').textContent = estado.aciertosPrimera + '/10';
+  $('#estCaso').textContent = estado.decisionesBien + '/5';
+  $('#estVirus').textContent = estado.virusVencidos;
+  $('#estContagios').textContent = estado.contagios;
+  $('#loreFinal').textContent = nivelD >= 3
+    ? 'Los sabios de la montaña del Maflaverse aplauden su sabiduría. Dragones y duendes detienen su batalla para celebrar al grupo. ¡Han ganado su favor!'
+    : 'Los sabios de la montaña del Maflaverse los animan a volver a intentarlo. ¡Cada intento los hace más sabios!';
+  $('#listaConceptos').innerHTML = CONCEPTOS.map(c => '<li>' + c + '</li>').join('');
+  mostrarPantalla('pantFinal');
+  setTimeout(() => nivelD >= 3 ? Sonido.victoria() : Sonido.derrota(), 300);
+}
+
+/* =====================================================================
+   CONTROLES: teclado + táctil/ratón
+   ===================================================================== */
+function juegoRecibeTeclas(){ return estado.activo && !estado.pausado && $('#modal').hidden; }
+
+window.addEventListener('keydown', e => {
+  if(!juegoRecibeTeclas()) return;
+  const k = e.key.toLowerCase();
+  if(k === 'arrowleft' || k === 'a'){ teclas.izq = true; e.preventDefault(); }
+  else if(k === 'arrowright' || k === 'd'){ teclas.der = true; e.preventDefault(); }
+  else if(k === 'arrowup' || k === 'w' || k === ' ' || e.code === 'Space'){
+    if(!e.repeat) saltoPedido = 8;
+    teclas.salto = true; e.preventDefault();
+  }
+});
+window.addEventListener('keyup', e => {
+  const k = e.key.toLowerCase();
+  if(k === 'arrowleft' || k === 'a') teclas.izq = false;
+  else if(k === 'arrowright' || k === 'd') teclas.der = false;
+  else if(k === 'arrowup' || k === 'w' || k === ' ' || e.code === 'Space') teclas.salto = false;
+});
+window.addEventListener('blur', () => pausarJuego(estado.pausado));
+
+document.querySelectorAll('.ctrl').forEach(btn => {
+  const control = btn.dataset.control;
+  const presionar = e => {
+    e.preventDefault();
+    Sonido.iniciar();
+    if(!juegoRecibeTeclas()) return;
+    try{ btn.setPointerCapture(e.pointerId); }catch(_){}
+    teclas[control] = true; btn.classList.add('presionado');
+    if(control === 'salto') saltoPedido = 8;
+  };
+  const soltar = () => { teclas[control] = false; btn.classList.remove('presionado'); };
+  btn.addEventListener('pointerdown', presionar);
+  btn.addEventListener('pointerup', soltar);
+  btn.addEventListener('pointercancel', soltar);
+  btn.addEventListener('lostpointercapture', soltar);
+  btn.addEventListener('contextmenu', e => e.preventDefault());
+});
+
+/* =====================================================================
+   EVENTOS DE LA INTERFAZ
+   ===================================================================== */
+// Activar audio con la primera interacción y sonido de botón en todos los botones
+document.addEventListener('pointerdown', () => Sonido.iniciar(), { once:true });
+document.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if(b && !b.classList.contains('ctrl') && !b.classList.contains('op-caso')) Sonido.boton();
+});
+
+$('#btnSonido').addEventListener('click', () => {
+  Sonido.iniciar();
+  const mudo = Sonido.alternar();
+  const b = $('#btnSonido');
+  b.textContent = mudo ? '🔇 Silencio' : '🔊 Sonido';
+  b.setAttribute('aria-pressed', mudo);
+  b.setAttribute('aria-label', mudo ? 'Activar sonido' : 'Silenciar sonido');
+});
+
+$('#btnAgregar').addEventListener('click', () => agregarIntegrante().querySelector('.in-nombre').focus());
+$('#formRegistro').addEventListener('submit', validarRegistro);
+$('#btnEditarGrupo').addEventListener('click', () => mostrarPantalla('pantRegistro'));
+$('#btnJugar').addEventListener('click', iniciarPartida);
+$('#btnCasoSig').addEventListener('click', siguienteDecision);
+$('#btnVerResultado').addEventListener('click', mostrarFinal);
+$('#btnJugarDeNuevo').addEventListener('click', iniciarPartida);
+$('#btnVolverInicio').addEventListener('click', () => { pintarListaGrupo($('#listaInicio')); mostrarPantalla('pantInicio'); });
+$('#btnNuevoGrupo').addEventListener('click', () => {
+  grupo.integrantes = [];
+  $('#listaIntegrantes').innerHTML = '';
+  agregarIntegrante();
+  mostrarPantalla('pantRegistro');
+});
+
+/* Arranque */
+agregarIntegrante();
+agregarIntegrante();
+requestAnimationFrame(bucle);
+</script>
+</body>
+</html>
